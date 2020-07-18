@@ -3,6 +3,8 @@ import numpy as np
 
 
 def clear_file(file):
+    if '_cleaned' in file:
+        return
     f = open(file, encoding='utf-8', mode='r')
     data = f.readlines()
     f.close()
