@@ -1,17 +1,7 @@
 import glob
 import numpy as np
 
-
-def clear_file(file):
-    if '_cleaned' in file:
-        return
-    f = open(file, encoding='utf-8', mode='r')
-    data = f.readlines()
-    f.close()
-    f = open(file[:-4]+'_cleaned.txt', encoding='utf-8', mode='w')
-    f.writelines(sorted(list(set(data))))
-    f.close()
-
+from utils import clear_file
 
 for file in glob.glob('./art/*.txt'):
     clear_file(file)

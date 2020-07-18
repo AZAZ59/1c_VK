@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+import pandas as pd
+from tqdm import tqdm
+
 
 class DotDict(dict):
     __getattr__ = dict.__getitem__
@@ -35,3 +38,24 @@ class VK_Item():
     photo_url: str
     description: str
     link: str
+
+def clear_file(file):
+    if '_cleaned' in file:
+        return
+    f = open(file, encoding='utf-8', mode='r')
+    data = f.readlines()
+    f.close()
+    f = open(file[:-4] + '_cleaned.txt', encoding='utf-8', mode='w')
+    f.writelines(sorted(list(set(data))))
+    f.close()
+
+def merge_excel():
+    import glob
+    big_df = pd.DataFrame()
+    for file in tqdm(glob.glob('./res/_processed_*')):
+        df = pd.read_excel(file,index_col=0)
+        big_df = big_df.append(df,ignore_index=True)
+    big_df.to_excel('./_processed_FULL.xlsx',index=False)
+
+if __name__ == '__main__':
+    merge_excel()

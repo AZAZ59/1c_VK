@@ -1,4 +1,3 @@
-import hashlib
 from dataclasses import asdict
 from pprint import pprint
 from tkinter import *
@@ -11,7 +10,7 @@ from tqdm import tqdm
 
 # dct = DotDict(dct)
 from config import session
-from utils import Request_new, VK_Item
+from utils import Request_new, VK_Item, merge_excel
 
 vk.api.Request = Request_new
 
@@ -33,6 +32,7 @@ def process_photo_batch(photos):
 
 error_out = None
 art_out = None
+
 
 def get_sizes(art, rows):
     if ' р ' not in art:
@@ -82,17 +82,18 @@ def extract_art_and_data(raw_data):
     return data_cols, rows
 
 
-def extract_correnct_art_and_name(art:str):
+def extract_correnct_art_and_name(art: str):
     for word in art_split_markers:
         if word in art.lower():
-            split_ind=art.lower().index(word)
-            ret_art=art[:split_ind]
-            ret_name=art[split_ind:]
-            return ret_art,ret_name
+            split_ind = art.lower().index(word)
+            ret_art = art[:split_ind]
+            ret_name = art[split_ind:]
+            return ret_art, ret_name
     ### Если не нашли ни одного слова
-    art_out.write(art+'\n')
+    art_out.write(art + '\n')
     art_out.flush()
-    return art,'________NOT_FOUND__________'
+    return art, '________NOT_FOUND__________'
+
 
 def process_to_1c(df, save_dir, name):
     df2 = pd.DataFrame(columns=[
@@ -107,7 +108,7 @@ def process_to_1c(df, save_dir, name):
         'Описание',
         "new_name"
     ])
-    global error_out,art_out
+    global error_out, art_out
     error_out = open(f'./errors/{name}.txt', 'w', encoding='utf-8')
     art_out = open(f'./art/{name}.txt', 'w', encoding='utf-8')
     for ind, row in tqdm(df.iterrows(), total=len(df)):
@@ -118,14 +119,14 @@ def process_to_1c(df, save_dir, name):
 
         for ind1, art in enumerate(rows):
             all_sizes, art, size = get_sizes(art, rows)
-            art_new,name_new = extract_correnct_art_and_name(art)
+            art_new, name_new = extract_correnct_art_and_name(art)
 
             if len(data_cols) < 1:
                 continue
             try:
                 data_cols[-1] = int(
                     str(data_cols[-1]).lower().replace('руб.', '').replace('руб', '').replace('цена:', '')
-                    .replace(':','').strip())
+                        .replace(':', '').strip())
             except:
                 data_cols[-1] = "_______НЕТ_ЦЕНЫ________"
 
@@ -139,16 +140,17 @@ def process_to_1c(df, save_dir, name):
             description = description.strip()
 
             df2 = df2.append({
-                "Большое фото"      : row['photo_url'] if ind1 == 0 else '',
-                "Ссылка на товар"   : row['link'] if ind1 == 0 else '',
-                "Артикул"           : art_new,
-                "Наименование"      : art,
-                "Размеры"           : size,
-                "Ткань"             : data_cols[-3] if len(data_cols) >= 3 else "",
-                'Состав'            : data_cols[-2] if len(data_cols) >= 2 else "",
-                'Цена'              : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
-                'Описание'          : description,
-                "new_name"          :name_new
+                "Большое фото"   : row['photo_url'] if ind1 == 0 else '',
+                "Ссылка на товар": row['link'] if ind1 == 0 else '',
+                "Артикул"        : art_new,
+                "Наименование"   : art,
+                "Размеры"        : size,
+                "Ткань"          : data_cols[-3] if len(data_cols) >= 3 else "",
+                'Состав'         : data_cols[-2] if len(data_cols) >= 2 else "",
+                'Цена'           : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
+                'Описание'       : description,
+                "new_name"       : name_new,
+                "album"          : name
             }, ignore_index=True)
 
     error_out.close()
@@ -160,7 +162,6 @@ def process_to_1c(df, save_dir, name):
 
 
 def download_vk_album(group_id, album_id, save_dir):
-
     api = vk.API(session, v='5.92')
 
     group_id = int(group_id)
@@ -236,7 +237,7 @@ class MyFirstGUI:
 
         self.process_status = Label(self.master, text="...")
 
-        self.save_dir='./res'
+        self.save_dir = './res'
 
     def select_save_file(self):
         self.save_dir = filedialog.askdirectory()
@@ -252,8 +253,13 @@ class MyFirstGUI:
         print("process_file")
         self.process_status['text'] = 'В обработке'
         download_vk_album(self.group_id.get(), self.album_id.get(), self.save_dir)
+
+        merge_excel()
+
         self.process_status['text'] = 'Обработка завершена'
         # process_files(self.price_file,self.blank_file,self.out_file,self.log)
+
+
 
 
 root = Tk()
