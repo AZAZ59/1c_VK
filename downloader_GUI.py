@@ -50,12 +50,6 @@ def get_sizes(art, rows):
     return all_sizes, art, size
 
 
-def get_hash(art):
-    art_hash = hashlib.md5(art.encode('utf-8')).hexdigest()
-    art_hash = int(art_hash, 16) % 1000000
-    return art_hash
-
-
 def extract_art_and_data(raw_data):
     rows = []
     data_cols = []
@@ -89,10 +83,9 @@ def extract_art_and_data(raw_data):
 
 
 def extract_correnct_art_and_name(art:str):
-    art=art.lower()
     for word in art_split_markers:
-        if word in art:
-            split_ind=art.index(word)
+        if word in art.lower():
+            split_ind=art.lower().index(word)
             ret_art=art[:split_ind]
             ret_name=art[split_ind:]
             return ret_art,ret_name
@@ -102,8 +95,18 @@ def extract_correnct_art_and_name(art:str):
     return art,'________NOT_FOUND__________'
 
 def process_to_1c(df, save_dir, name):
-    df2 = pd.DataFrame(columns=["Большое фото", "Ссылка на товар", "Артикул", "Без_3х_слов", "До_второго_пробела", "Размеры", "Ткань",
-             'Состав', 'Цена', 'Хэш_сумма', 'Описание', "new_art","new_name" ])
+    df2 = pd.DataFrame(columns=[
+        "Большое фото",
+        "Ссылка на товар",
+        "Артикул",
+        "Наименование",
+        "Размеры",
+        "Ткань",
+        'Состав',
+        'Цена',
+        'Описание',
+        "new_name"
+    ])
     global error_out,art_out
     error_out = open(f'./errors/{name}.txt', 'w', encoding='utf-8')
     art_out = open(f'./art/{name}.txt', 'w', encoding='utf-8')
@@ -114,8 +117,6 @@ def process_to_1c(df, save_dir, name):
         data_cols, rows = extract_art_and_data(raw_data)
 
         for ind1, art in enumerate(rows):
-            art_hash = get_hash(art)
-
             all_sizes, art, size = get_sizes(art, rows)
             art_new,name_new = extract_correnct_art_and_name(art)
 
@@ -123,14 +124,12 @@ def process_to_1c(df, save_dir, name):
                 continue
             try:
                 data_cols[-1] = int(
-                    str(data_cols[-1]).lower().replace('руб.', '').replace('руб', '').replace('цена:', '').replace(':',
-                                                                                                                   '').strip())
+                    str(data_cols[-1]).lower().replace('руб.', '').replace('руб', '').replace('цена:', '')
+                    .replace(':','').strip())
             except:
                 data_cols[-1] = "_______НЕТ_ЦЕНЫ________"
 
-            art = art.replace('?', '')
-            art = art.strip()
-            art_only3 = ' '.join(art.split(' ')[:3]).strip()
+            art = art.replace('?', '').strip()
 
             description = f'Артикул: {art}\n' + f'Размеры: {all_sizes}\n'
             if len(data_cols) >= 3:
@@ -142,16 +141,13 @@ def process_to_1c(df, save_dir, name):
             df2 = df2.append({
                 "Большое фото"      : row['photo_url'] if ind1 == 0 else '',
                 "Ссылка на товар"   : row['link'] if ind1 == 0 else '',
-                "Артикул"           : art_only3,
-                "Без_3х_слов"       : ' '.join(art.split(' ')[:-3]),
-                "До_второго_пробела": ' '.join(art.split(' ')[:2]),
+                "Артикул"           : art_new,
+                "Наименование"      : art,
                 "Размеры"           : size,
                 "Ткань"             : data_cols[-3] if len(data_cols) >= 3 else "",
                 'Состав'            : data_cols[-2] if len(data_cols) >= 2 else "",
                 'Цена'              : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
-                'Хэш_сумма'         : art_hash,
                 'Описание'          : description,
-                "new_art"           :art_new,
                 "new_name"          :name_new
             }, ignore_index=True)
 
