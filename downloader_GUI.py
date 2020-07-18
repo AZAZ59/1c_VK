@@ -239,6 +239,8 @@ class MyFirstGUI:
 
         self.process_status = Label(self.master, text="...")
 
+        self.save_dir='./'
+
     def select_save_file(self):
         self.save_dir = filedialog.askdirectory()
         self.selected_save_file['text'] = 'Каталог для сохранения:\n ' + self.save_dir
