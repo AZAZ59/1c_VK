@@ -2,3 +2,4 @@
 /errors/*.txt
 config.py
 /**/*.xlsx
+__pycache__/**
