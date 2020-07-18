@@ -1,0 +1,4 @@
+/art/*
+/errors/*
+config.py
+/**/*.xlsx
