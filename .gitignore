@@ -1,4 +1,4 @@
-/art/*
-/errors/*
+/art/*.txt
+/errors/*.txt
 config.py
 /**/*.xlsx
