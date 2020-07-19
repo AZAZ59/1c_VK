@@ -97,7 +97,7 @@ def extract_correnct_art_and_name(art: str):
 
 def process_to_1c(df, save_dir, name):
     df2 = pd.DataFrame(columns=[
-        "Большое фото",
+        "Картинка",
         "Ссылка на товар",
         "Артикул",
         "Наименование",
@@ -106,7 +106,8 @@ def process_to_1c(df, save_dir, name):
         'Состав',
         'Цена',
         'Описание',
-        "new_name"
+        "new_name",
+        "Вид номенклатуры"
     ])
     global error_out, art_out
     error_out = open(f'./errors/{name}.txt', 'w', encoding='utf-8')
@@ -140,17 +141,17 @@ def process_to_1c(df, save_dir, name):
             description = description.strip()
 
             df2 = df2.append({
-                "Большое фото"   : row['photo_url'] if ind1 == 0 else '',
-                "Ссылка на товар": row['link'] if ind1 == 0 else '',
-                "Артикул"        : art_new,
-                "Наименование"   : art,
-                "Размеры"        : size,
-                "Ткань"          : data_cols[-3] if len(data_cols) >= 3 else "",
-                'Состав'         : data_cols[-2] if len(data_cols) >= 2 else "",
-                'Цена'           : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
-                'Описание'       : description,
-                "new_name"       : name_new,
-                "album"          : name
+                "Картинка"        : row['photo_url'] if ind1 == 0 else '',
+                "Ссылка на товар" : row['link'] if ind1 == 0 else '',
+                "Артикул"         : art_new,
+                "Наименование"    : art,
+                "Размеры"         : size,
+                "Ткань"           : data_cols[-3] if len(data_cols) >= 3 else "",
+                'Состав'          : data_cols[-2] if len(data_cols) >= 2 else "",
+                'Цена'            : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
+                'Описание'        : description,
+                "new_name"        : name_new,
+                "Вид номенклатуры": name
             }, ignore_index=True)
 
     error_out.close()
