@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
 import pandas as pd
+import requests
+import vk
 from tqdm import tqdm
 
 
@@ -17,7 +19,6 @@ class DotDict(dict):
                 value = [DotDict(x) for x in value]
             self[key] = value
 
-
 class Request_new(object):
     __slots__ = ('_api', '_method_name', '_method_args')
 
@@ -30,7 +31,22 @@ class Request_new(object):
 
     def __call__(self, **method_args):
         self._method_args = method_args
-        return DotDict(self._api._session.make_request(self))
+        res=self._api._session.make_request(self)
+        if type(res)==dict:
+            return DotDict(res)
+        else:
+            return res
+
+vk.api.Request = Request_new
+
+
+def download_photo(row_ind, url,group_id, album_id,pbar=None):
+    content = requests.get(url, verify=False).content
+    with open(f'./dir_to_send/{group_id}_{album_id}_file_{row_ind:05}.jpg', "wb") as file:
+        file.write(content)
+
+class CannotUploadPhotoException(Exception):
+    pass
 
 
 @dataclass
@@ -38,6 +54,7 @@ class VK_Item():
     photo_url: str
     description: str
     link: str
+
 
 def clear_file(file):
     if '_cleaned' in file:
@@ -49,13 +66,15 @@ def clear_file(file):
     f.writelines(sorted(list(set(data))))
     f.close()
 
+
 def merge_excel():
     import glob
     big_df = pd.DataFrame()
     for file in tqdm(glob.glob('./res/_processed_*')):
-        df = pd.read_excel(file,index_col=0)
-        big_df = big_df.append(df,ignore_index=True)
-    big_df.to_excel('./_processed_FULL.xlsx',index=False)
+        df = pd.read_excel(file, index_col=0)
+        big_df = big_df.append(df, ignore_index=True)
+    big_df.to_excel('./_processed_FULL.xlsx', index=False)
+
 
 if __name__ == '__main__':
     merge_excel()
