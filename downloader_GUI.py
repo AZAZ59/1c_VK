@@ -12,7 +12,6 @@ from tqdm import tqdm
 from config import session
 from utils import Request_new, VK_Item, merge_excel
 
-vk.api.Request = Request_new
 
 split_marker = set(x.lower().strip() for x in open('./split_markers.txt', encoding='utf-8').readlines())
 art_split_markers = set(x.lower().strip() for x in open('./art_markers.txt', encoding='utf-8').readlines())
