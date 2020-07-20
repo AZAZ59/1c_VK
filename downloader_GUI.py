@@ -105,7 +105,7 @@ def process_to_1c(df, save_dir, name):
         "Ткань",
         'Состав',
         'Цена',
-        'Описание',
+###     'Описание',
         "new_name",
         "Вид номенклатуры"
     ])
@@ -133,12 +133,12 @@ def process_to_1c(df, save_dir, name):
 
             art = art.replace('?', '').strip()
 
-            description = f'Артикул: {art}\n' + f'Размеры: {all_sizes}\n'
-            if len(data_cols) >= 3:
-                description += f'{data_cols[-3]}\n'
-            if len(data_cols) >= 2:
-                description += f'{data_cols[-2]}\n'
-            description = description.strip()
+###            description = f'Артикул: {art}\n' + f'Размеры: {all_sizes}\n'
+###            if len(data_cols) >= 3:
+###                description += f'{data_cols[-3]}\n'
+###            if len(data_cols) >= 2:
+###                description += f'{data_cols[-2]}\n'
+###            description = description.strip()
 
             df2 = df2.append({
                 "Картинка"        : row['photo_url'] if ind1 == 0 else '',
@@ -149,7 +149,7 @@ def process_to_1c(df, save_dir, name):
                 "Ткань"           : data_cols[-3] if len(data_cols) >= 3 else "",
                 'Состав'          : data_cols[-2] if len(data_cols) >= 2 else "",
                 'Цена'            : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
-                'Описание'        : description,
+###             'Описание'        : description,
                 "new_name"        : name_new,
                 "Вид номенклатуры": name
             }, ignore_index=True)
