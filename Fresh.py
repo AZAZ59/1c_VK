@@ -93,7 +93,7 @@ def main():
     for item in item_list:
         for ind,color in enumerate(item.color):
             new_item=Item(
-                name            = item.name,
+                name            = item.name + ' ' + item.color[ind],
                 cost            = item.cost,
                 description     = item.description,
                 color           = item.color[ind],
@@ -104,7 +104,7 @@ def main():
 
     df = pd.DataFrame([asdict(x) for x in items])
     print(df.columns)
-    df.columns=['Номенклатура', 'Розничная', 'Описание', 'Состав', 'Размер', 'Картинка']
+    df.columns=['Номенклатура', 'Розничная', 'Описание', 'Состав', 'Размер', 'Картинка', "Вид номенклатуры"]
     df.to_excel('./result.xlsx')
 
 
