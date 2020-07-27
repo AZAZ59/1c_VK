@@ -103,6 +103,8 @@ def main():
             items.append(new_item)
 
     df = pd.DataFrame([asdict(x) for x in items])
+    print(df.columns)
+    df.columns=['name', 'cost', 'description', 'color', 'availabel_sizes', 'imgs_str']
     df.to_excel('./result.xlsx')
 
 
