@@ -114,7 +114,14 @@ def main():
     workbook  = writer.book
     worksheet = writer.sheets['Sheet1']
 
-    worksheet.set_column('A:A', 70)
+    worksheet.set_column('A:A', 55)
+    worksheet.set_column('B:B',  8)
+    worksheet.set_column('C:C', 25)
+    worksheet.set_column('D:D', 25)
+    worksheet.set_column('E:E', 25)
+    worksheet.set_column('F:F', 25)
+    worksheet.set_column('G:G', 25)
+
     writer.save()
     writer.close()
 
