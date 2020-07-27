@@ -104,8 +104,19 @@ def main():
 
     df = pd.DataFrame([asdict(x) for x in items])
     print(df.columns)
+
+    df["Вид номенклатуры"]="Текст названия"
     df.columns=['Номенклатура', 'Розничная', 'Описание', 'Состав', 'Размер', 'Картинка', "Вид номенклатуры"]
-    df.to_excel('./result.xlsx')
+
+    writer = pd.ExcelWriter("./result.xlsx", engine='xlsxwriter')
+    df.to_excel(writer,index=False)
+
+    workbook  = writer.book
+    worksheet = writer.sheets['Sheet1']
+
+    worksheet.set_column('A:A', 70)
+    writer.save()
+    writer.close()
 
 
 if __name__ == '__main__':
