@@ -1,9 +1,24 @@
+import time
 from dataclasses import dataclass
 
 import pandas as pd
 import requests
 import vk
 from tqdm import tqdm
+
+def retry(retries=3):
+    def decorator(f):
+        def inner(*args, **kwargs):
+            for i in range(1,retries+1):
+                try:
+                    return f(*args, **kwargs)
+                except Exception as e:
+                    print(e, 'sleep ', 5 * i, 'sec')
+                    print("Retries Left", retries-i)
+                    time.sleep(5 * i)
+            raise Exception("Retried {} times".format(retries))
+        return inner
+    return decorator
 
 
 class DotDict(dict):
@@ -29,6 +44,7 @@ class Request_new(object):
     def __getattr__(self, method_name):
         return Request_new(self._api, self._method_name + '.' + method_name)
 
+    @retry(30)
     def __call__(self, **method_args):
         self._method_args = method_args
         res=self._api._session.make_request(self)
@@ -47,6 +63,8 @@ def download_photo(row_ind, url,group_id, album_id,pbar=None):
 
 class CannotUploadPhotoException(Exception):
     pass
+
+
 
 
 @dataclass
