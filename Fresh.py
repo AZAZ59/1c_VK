@@ -93,18 +93,18 @@ def main():
     for item in item_list:
         for ind,color in enumerate(item.color):
             new_item=Item(
-                name=item.name,
-                cost=item.cost,
-                description=item.description,
-                color=item.color[ind],
-                availabel_sizes=', '.join([size for ind1,size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                imgs_str=', '.join(item.imgs)
+                name            = item.name,
+                cost            = item.cost,
+                description     = item.description,
+                color           = item.color[ind],
+                availabel_sizes = ', '.join ([size for ind1,size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                imgs_str        = ', '.join (item.imgs)
             )
             items.append(new_item)
 
     df = pd.DataFrame([asdict(x) for x in items])
     print(df.columns)
-    df.columns=['name', 'cost', 'description', 'color', 'availabel_sizes', 'imgs_str']
+    df.columns=['Номенклатура', 'Розничная', 'Описание', 'Состав', 'Размер', 'Картинка']
     df.to_excel('./result.xlsx')
 
 
