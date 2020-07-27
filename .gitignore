@@ -3,3 +3,4 @@
 config.py
 /**/*.xlsx
 __pycache__/**
+*.jpg

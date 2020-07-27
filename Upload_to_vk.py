@@ -95,7 +95,7 @@ def download_all_photo(album_id, df, group_id):
 
 
 def preprocess():
-    df = pd.read_excel('./Выгрузка в ВК (2).xlsx')
+    df = pd.read_excel('./Выгрузка в ВК.xlsx',header=3).iloc[3:]
     df2 = pd.DataFrame()
     for name, group in tqdm(df.groupby('Наименование')):
         sizes = ', '.join([str(x) for x in list(group['Характеристика'])])
@@ -103,10 +103,11 @@ def preprocess():
         description += f'Артикул: {name}\n'
         if len(sizes) != 0 and sizes != 'nan':
             description += f'Размеры: {sizes}\n'
-        if group["Состав"].iloc[0] != 'nan':
+        if str(group["Состав"].iloc[0]) != 'nan':
             description += f'Состав: {group["Состав"].iloc[0]}\n'
 
-        description += f'Цена: {group["Розничная"].iloc[0]} руб.\n'
+        if str(group["Розничная"].iloc[0]) != 'nan':
+            description += f'Цена: {group["Розничная"].iloc[0]} руб.\n'
 
         if 'https' in str(group['Фото'].iloc[0]):
             df2 = df2.append({
