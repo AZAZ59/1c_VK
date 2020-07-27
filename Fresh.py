@@ -97,8 +97,8 @@ def main():
                 cost=item.cost,
                 description=item.description,
                 color=item.color[ind],
-                availabel_sizes='; '.join([size for ind1,size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                imgs_str=' ; '.join(item.imgs)
+                availabel_sizes=', '.join([size for ind1,size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                imgs_str=', '.join(item.imgs)
             )
             items.append(new_item)
 
