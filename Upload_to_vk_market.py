@@ -124,9 +124,10 @@ def download_all_photo(album_id, df, group_id):
 def preprocess():
     df = pd.read_excel('./Выгрузка в ВК (2).xlsx')
     # df = df[df['НГруппа'] == 'ЗИМА_(верхняя_одежда)']
-
+    sizes_set=set()
     df2 = pd.DataFrame()
     for name, group in tqdm(df.groupby('Наименование')):
+        sizes_set.update(set([str(x) for x in list(group['Характеристика'])]))
         sizes = ', '.join([str(x) for x in list(group['Характеристика'])])
         description = ''
         if len(sizes) != 0 and sizes != 'nan':
@@ -145,7 +146,10 @@ def preprocess():
             }, ignore_index=True)
         else:
             print(str(group['Фото'].iloc[0]))
-
+    print(df2.head())
+    print(sizes_set)
+    print(len(sizes_set))
+    1/0
     return df2
 
 
