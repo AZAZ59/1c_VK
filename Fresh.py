@@ -85,7 +85,7 @@ def parse_file(filename)->List[Item_row] :
 
 
 def main():
-    filename='./sheet001.htm'
+    filename='./ОтПоставщиков/sheet001.htm'
 
     item_list = parse_file(filename)
 
@@ -105,10 +105,11 @@ def main():
     df = pd.DataFrame([asdict(x) for x in items])
     print(df.columns)
 
-    df["Вид номенклатуры"]="Текст названия"
+    df["Вид номенклатуры"]="CLEVER"
+
     df.columns=['Номенклатура', 'Розничная', 'Описание', 'Состав', 'Размер', 'Картинка', "Вид номенклатуры"]
 
-    writer = pd.ExcelWriter("./result.xlsx", engine='xlsxwriter')
+    writer = pd.ExcelWriter("./File/_Fresh_1C.xlsx", engine='xlsxwriter')
     df.to_excel(writer,index=False)
 
     workbook  = writer.book

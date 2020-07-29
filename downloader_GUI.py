@@ -14,7 +14,7 @@ from utils import Request_new, VK_Item, merge_excel
 
 
 split_marker = set(x.lower().strip() for x in open('./split_markers.txt', encoding='utf-8').readlines())
-art_split_markers = set(x.lower().strip() for x in open('./art_markers.txt', encoding='utf-8').readlines())
+art_split_markers = set(" "+(x.lower().strip()) for x in open('./art_markers.txt', encoding='utf-8').readlines())
 
 pprint(split_marker)
 pprint(art_split_markers)
@@ -98,14 +98,12 @@ def process_to_1c(df, save_dir, name):
     df2 = pd.DataFrame(columns=[
         "Картинка",
         "Ссылка на товар",
-        "Артикул",
-        "Наименование",
-        "Размеры",
-        "Ткань",
+        "Номенклатура",
+        "Наименование полное",
+        "Размер",
         'Состав',
-        'Цена',
-###     'Описание',
-        "new_name",
+        'Розничная',
+  #     "new_name",
         "Вид номенклатуры"
     ])
     global error_out, art_out
@@ -132,25 +130,16 @@ def process_to_1c(df, save_dir, name):
 
             art = art.replace('?', '').strip()
 
-###            description = f'Артикул: {art}\n' + f'Размеры: {all_sizes}\n'
-###            if len(data_cols) >= 3:
-###                description += f'{data_cols[-3]}\n'
-###            if len(data_cols) >= 2:
-###                description += f'{data_cols[-2]}\n'
-###            description = description.strip()
-
             df2 = df2.append({
-                "Картинка"        : row['photo_url'] if ind1 == 0 else '',
-                "Ссылка на товар" : row['link'] if ind1 == 0 else '',
-                "Артикул"         : art_new,
-                "Наименование"    : art,
-                "Размеры"         : size,
-                "Ткань"           : data_cols[-3] if len(data_cols) >= 3 else "",
-                'Состав'          : data_cols[-2] if len(data_cols) >= 2 else "",
-                'Цена'            : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
-###             'Описание'        : description,
-                "new_name"        : name_new,
-                "Вид номенклатуры": name
+                "Картинка"             : row['photo_url'] if ind1 == 0 else '',
+                "Ссылка на товар"      : row['link'] if ind1 == 0 else '',
+                "Номенклатура"         : art_new,
+                "Наименование полное"  : art,
+                "Размер"               : size,
+                'Состав'               : ((data_cols[-3]+" ") if len(data_cols) >= 3 else "") + (data_cols[-2] if len(data_cols) >= 2 else ""),
+                'Розничная'                 : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
+    #           "new_name"             : name_new,
+                "Вид номенклатуры"     : name
             }, ignore_index=True)
 
     error_out.close()

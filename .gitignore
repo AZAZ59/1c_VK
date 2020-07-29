@@ -5,3 +5,8 @@ config.py
 __pycache__/**
 *.jpg
 sheet001.htm
+1_Загрузка_из_VK_в_1C.py
+2_Обработка_Прайса_Fresh.py
+File/МЗД_Настройки.txt
+ОтПоставщиков/ostatok_NN_22_07.xls
+ОтПоставщиков/ostatok_Piter_22_07.xls
