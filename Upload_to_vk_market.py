@@ -123,7 +123,7 @@ def download_all_photo(album_id, df, group_id):
 
 
 def preprocess():
-    df = pd.read_excel('./Выгрузка в ВК (2).xlsx')
+    df = pd.read_excel('./File/Выгрузка в ВК.xlsx')
     # df = df[df['НГруппа'] == 'ЗИМА_(верхняя_одежда)']
     sizes_set=set()
     df2 = pd.DataFrame()
