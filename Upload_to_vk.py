@@ -86,7 +86,7 @@ def upload_photo(api, group_id, album_id, filename, upload_url):
 
 def download_all_photo(album_id, df, group_id):
     photo = df['Фото']
-    urls = list(zip(photo.index, photo))
+    urls = list(zip(photo.index, [x.split(',')[0].strip() for x in photo]))
     print('start download photo','count = ',len(urls))
     part_download_photo = partial(download_photo, group_id=group_id, album_id=album_id)
     download_pool = Pool(16)
