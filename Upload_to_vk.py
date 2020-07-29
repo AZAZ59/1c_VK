@@ -22,8 +22,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 def main():
     preprocessed = preprocess()
     api = vk.API(session, v='5.92')
-    group_id = '192858688'
-    # album_id = '273496903'
+    group_id = '89966254'
+  # group_id = '192858688'
+  # album_id = '273496903'
 
     for group_name, df in preprocessed.groupby('Группа'):
         print(f'Process group {group_name}')
@@ -95,7 +96,7 @@ def download_all_photo(album_id, df, group_id):
 
 
 def preprocess():
-    df = pd.read_excel('./Выгрузка в ВК.xlsx',header=3).iloc[3:]
+    df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
     df2 = pd.DataFrame()
     for name, group in tqdm(df.groupby('Наименование')):
         sizes = ', '.join([str(x) for x in list(group['Характеристика'])])
@@ -107,9 +108,9 @@ def preprocess():
             description += f'Состав: {group["Состав"].iloc[0]}\n'
 
         if str(group["Розничная"].iloc[0]) != 'nan':
-            description += f'Цена: {group["Розничная"].iloc[0]} руб.\n'
+            description += f'Цена: {int(group["Розничная"].iloc[0])} руб.\n'
 
-        if 'https' in str(group['Фото'].iloc[0]):
+        if 'http' in str(group['Фото'].iloc[0]):
             df2 = df2.append({
                 'Наименование': str(name),
                 'Описание'    : description,
@@ -118,7 +119,7 @@ def preprocess():
             }, ignore_index=True)
         else:
             print(str(group['Фото'].iloc[0]))
-    df2.to_excel('./to_album_vk.xlsx')
+    df2.to_excel('./File/to_album_vk.xlsx')
     return df2
 
 
