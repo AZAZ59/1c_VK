@@ -85,7 +85,7 @@ def parse_file(filename)->List[Item_row] :
 
 
 def main():
-    filename='./ОтПоставщиков/sheet001.htm'
+    filename='./InputPrice/sheet001.htm'
 
     item_list = parse_file(filename)
 
