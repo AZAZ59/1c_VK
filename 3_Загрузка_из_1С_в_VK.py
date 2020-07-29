@@ -1,1 +1,0 @@
-D:/1cv8/Обработка_09_07/1c_VK/Upload_to_vk.py
