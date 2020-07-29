@@ -2,9 +2,9 @@
 /errors/**
 /__pycache__/**
 /File/**
-/�⏮�⠢騪��/**
+/InputPrice/**
 /**/*.xlsx
 *.jpg
 config.py
 sheet001.htm
-ОтПоставщиков/ostatok_NN_22_07.xls
+
