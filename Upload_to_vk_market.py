@@ -150,7 +150,6 @@ def preprocess():
     print(df2.head())
     print(sizes_set)
     print(len(sizes_set))
-    1/0
     return df2
 
 
