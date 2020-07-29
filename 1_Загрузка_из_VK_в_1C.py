@@ -1,1 +1,1 @@
-D:/1cv8/Обработка_09_07/1c_VK/downloader_GUI.py
+./downloader_GUI.py
