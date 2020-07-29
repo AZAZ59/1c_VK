@@ -9,8 +9,8 @@ from bs4 import BeautifulSoup
 
 def tryParse(value):
     try:
-        float(value)
-        return True
+        return float(value)>0
+#        return True
     except ValueError:
         return False
 
@@ -93,19 +93,37 @@ def main():
     for item in item_list:
         for ind,color in enumerate(item.color):
             new_item=Item(
-                name=item.name,
-                cost=item.cost,
-                description=item.description,
-                color=item.color[ind],
-                availabel_sizes=', '.join([size for ind1,size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                imgs_str=', '.join(item.imgs)
+                name            = item.name + ' ' + item.color[ind],
+                cost            = item.cost,
+                description     = item.description,
+                color           = item.color[ind],
+                availabel_sizes = ', '.join ([size for ind1,size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                imgs_str        = ', '.join (item.imgs)
             )
             items.append(new_item)
 
     df = pd.DataFrame([asdict(x) for x in items])
     print(df.columns)
-    df.columns=['name', 'cost', 'description', 'color', 'availabel_sizes', 'imgs_str']
-    df.to_excel('./result.xlsx')
+
+    df["Вид номенклатуры"]="Текст названия"
+    df.columns=['Номенклатура', 'Розничная', 'Описание', 'Состав', 'Размер', 'Картинка', "Вид номенклатуры"]
+
+    writer = pd.ExcelWriter("./result.xlsx", engine='xlsxwriter')
+    df.to_excel(writer,index=False)
+
+    workbook  = writer.book
+    worksheet = writer.sheets['Sheet1']
+
+    worksheet.set_column('A:A', 55)
+    worksheet.set_column('B:B',  8)
+    worksheet.set_column('C:C', 25)
+    worksheet.set_column('D:D', 25)
+    worksheet.set_column('E:E', 25)
+    worksheet.set_column('F:F', 25)
+    worksheet.set_column('G:G', 25)
+
+    writer.save()
+    writer.close()
 
 
 if __name__ == '__main__':
