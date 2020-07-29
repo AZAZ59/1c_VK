@@ -9,8 +9,8 @@ from bs4 import BeautifulSoup
 
 def tryParse(value):
     try:
-        float(value)
-        return True
+        return float(value)>0
+#        return True
     except ValueError:
         return False
 
