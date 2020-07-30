@@ -14,9 +14,7 @@ logging.basicConfig(level=logging.INFO)
 import vk
 from tqdm import tqdm
 
-from config import session
-from config import group_id
-from config import owner_id
+from config import *
 
 from utils import CannotUploadPhotoException, download_photo
 
@@ -46,7 +44,7 @@ def main():
 
         for ind, row in tqdm(df.iterrows(), total=len(df)):
             description = row['Описание']
-            filename=lambda x:''.join([q if str.isalnum(q) else ' ' for q in x ])(row['Наименование'])
+            filename=''.join([q if str.isalnum(q) else ' ' for q in row['Наименование'] ])
             filename = f'./dir_to_send/{filename}.jpg'
 
             if pd.isna(filename[0]):
@@ -84,7 +82,7 @@ def main():
                 album_ids=[album_id],
 
             )
-            time.sleep(1)
+            time.sleep(0.3)
 
 
 def upload_photo(api, group_id, filename):
