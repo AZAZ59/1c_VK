@@ -44,7 +44,6 @@ def remove_all_items(owner_id, group_id):
 
 def main():
 
-    remove_all_items(owner_id,group_id)
     preprocessed = preprocess()
     # album_id = 12
     for group_name, df in preprocessed.groupby('Группа'):
@@ -174,4 +173,5 @@ def preprocess():
 
 
 if __name__ == '__main__':
-    main()
+    remove_all_items(owner_id,group_id)
+#    main()
