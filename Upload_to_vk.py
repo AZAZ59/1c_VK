@@ -6,13 +6,11 @@ import pandas as pd
 import requests
 import urllib3
 # logging.basicConfig(level=logging.DEBUG)
+
 import vk
 from tqdm import tqdm
 
-from config import session
-from config import group_id
-from config import owner_id
-
+from config import *
 
 from utils import CannotUploadPhotoException, download_photo
 
