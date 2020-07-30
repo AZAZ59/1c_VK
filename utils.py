@@ -54,12 +54,14 @@ class Request_new(object):
             return res
 
 vk.api.Request = Request_new
+import os.path
+def download_photo(url,name):
+    path=f'./dir_to_send/{name}.jpg'
+    if not os.path.isfile(path)  :
+        content = requests.get(url, verify=False).content
 
-
-def download_photo(row_ind, url,group_id, album_id,pbar=None):
-    content = requests.get(url, verify=False).content
-    with open(f'./dir_to_send/{group_id}_{album_id}_file_{row_ind:05}.jpg', "wb") as file:
-        file.write(content)
+        with open(path, "wb") as file:
+            file.write(content)
 
 class CannotUploadPhotoException(Exception):
     pass
