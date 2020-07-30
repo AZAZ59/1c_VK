@@ -174,4 +174,4 @@ def preprocess():
 
 if __name__ == '__main__':
     remove_all_items(owner_id,group_id)
-#    main()
+    main()
