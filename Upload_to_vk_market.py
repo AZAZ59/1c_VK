@@ -15,6 +15,9 @@ import vk
 from tqdm import tqdm
 
 from config import session
+from config import group_id
+from config import owner_id
+
 from utils import CannotUploadPhotoException, download_photo
 
 pd.set_option('display.max_rows', 1000)
@@ -25,10 +28,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def main():
+
     preprocessed = preprocess()
     api = vk.API(session, v='5.120')
-    group_id = 192858688
-    owner_id = -192858688
+    # group_id = 192858688
+    #owner_id = -192858688
 
     # album_id = 12
     for group_name, df in preprocessed.groupby('Группа'):
