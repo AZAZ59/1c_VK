@@ -32,12 +32,13 @@ def main():
         album = api.photos.createAlbum(title=group_name, group_id=group_id)
         album_id = album.id
 
-        download_all_photo(album_id, df, group_id)
+        download_all_photo(df)
 
         upload_url = api.photos.getUploadServer(album_id=album_id, group_id=group_id)['upload_url']
         for ind, row in tqdm(df.iterrows(), total=len(df)):
             description = row['Описание']
-            filename = f'./dir_to_send/{group_id}_{album_id}_file_{ind:05}.jpg'
+            filename=''.join([q if str.isalnum(q) else ' ' for q in row['Наименование']])
+            filename = f'./dir_to_send/{filename}.jpg'
 
             if pd.isna(filename[0]):
                 print(f'Ошибка! В строке {ind + 2} нет изображения')
@@ -84,19 +85,21 @@ def upload_photo(api, group_id, album_id, filename, upload_url):
     return resp_json
 
 
-def download_all_photo(album_id, df, group_id):
+def download_all_photo(df):
     photo = df['Фото']
-    urls = list(zip(photo.index, [x.split(',')[0].strip() for x in photo]))
-    print('start download photo','count = ',len(urls))
-    part_download_photo = partial(download_photo, group_id=group_id, album_id=album_id)
+    filename = df['Наименование'].apply(lambda x:''.join([q if str.isalnum(q) else ' ' for q in x ]))
+    url_name=list(zip(photo,filename))
+    
+    print('start download photo','count = ',len(url_name))
     download_pool = Pool(16)
-    download_pool.starmap(part_download_photo, urls)
+    download_pool.starmap(download_photo, url_name)
     download_pool.close()
     print('photos downloaded')
 
 
 def preprocess():
-    df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
+#    df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
+    df = pd.read_excel('./File/Выгрузка в ВК.xlsx')
     df2 = pd.DataFrame()
     for name, group in tqdm(df.groupby('Наименование')):
         sizes = ', '.join([str(x) for x in list(group['Характеристика'])])
