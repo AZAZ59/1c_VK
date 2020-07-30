@@ -14,7 +14,8 @@ logging.basicConfig(level=logging.INFO)
 import vk
 from tqdm import tqdm
 
-from config import session
+from config import *
+
 from utils import CannotUploadPhotoException, download_photo
 
 pd.set_option('display.max_rows', 1000)
@@ -53,11 +54,12 @@ def main():
         album = api.market.addAlbum(title=group_name, owner_id=owner_id)
         album_id = album.market_album_id
 
-        download_all_photo(album_id, df, group_id)
+        download_all_photo(df)
 
         for ind, row in tqdm(df.iterrows(), total=len(df)):
             description = row['Описание']
-            filename = f'./dir_to_send/{group_id}_{album_id}_file_{ind:05}.jpg'
+            filename=''.join([q if str.isalnum(q) else ' ' for q in row['Наименование'] ])
+            filename = f'./dir_to_send/{filename}.jpg'
 
             if pd.isna(filename[0]):
                 print(f'Ошибка! В строке {ind + 2} нет изображения')
@@ -126,19 +128,22 @@ def upload_photo(api, group_id, filename):
     return resp_json
 
 
-def download_all_photo(album_id, df, group_id):
+def download_all_photo(df):
     photo = df['Фото']
-    urls = list(zip(photo.index, photo))
-    print('start download photo', 'count = ', len(urls))
-    part_download_photo = partial(download_photo, group_id=group_id, album_id=album_id)
+    filename = df['Наименование'].apply(lambda x:''.join([q if str.isalnum(q) else ' ' for q in x ]))
+
+    url_name=list(zip(photo,filename))
+
+    print('start download photo','count = ',len(url_name))
+    part_download_photo = partial(download_photo)
     download_pool = Pool(16)
-    download_pool.starmap(part_download_photo, urls)
+    download_pool.starmap(download_photo, url_name)
     download_pool.close()
     print('photos downloaded')
 
 
 def preprocess():
-    df = pd.read_excel('./Выгрузка в ВК (2).xlsx')
+    df = pd.read_excel('./File/Выгрузка в ВК.xlsx')
     # df = df[df['НГруппа'] == 'ЗИМА_(верхняя_одежда)']
     sizes_set=set()
     df2 = pd.DataFrame()

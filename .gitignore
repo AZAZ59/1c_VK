@@ -1,10 +1,11 @@
-/art/*.txt
-/errors/*.txt
-config.py
+/art/**
+/errors/**
+/__pycache__/**
+/File/**
+/InputPrice/**
 /**/*.xlsx
-__pycache__/**
 *.jpg
+config.py
 sheet001.htm
-File/МЗД_Настройки.txt
-ОтПоставщиков/ostatok_NN_22_07.xls
-ОтПоставщиков/ostatok_Piter_22_07.xls
+
+Выгрузка Заказов из магазина.txt
