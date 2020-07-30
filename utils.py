@@ -44,7 +44,7 @@ class Request_new(object):
     def __getattr__(self, method_name):
         return Request_new(self._api, self._method_name + '.' + method_name)
 
-    @retry(30)
+    @retry(10)
     def __call__(self, **method_args):
         self._method_args = method_args
         res=self._api._session.make_request(self)

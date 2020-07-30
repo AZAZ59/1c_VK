@@ -23,13 +23,28 @@ pd.set_option('display.max_colwidth', 1000)
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+api = vk.API(session, v='5.120')
+group_id = 192858688
+owner_id = -group_id
+
+
+def remove_all_items(owner_id, group_id):
+    count=api.market.get(owner_id=owner_id,count=0,offset=0).count
+    step=200
+    while count>0:
+        res=api.market.get(owner_id=owner_id,count=step,offset=0)
+        count=res['count']
+        items=res['items']
+        print(count)
+        for item in tqdm(items):
+            item_id=item.id
+            q=api.market.delete(owner_id=owner_id,item_id=item_id)
+            time.sleep(0.3)
 
 def main():
-    preprocessed = preprocess()
-    api = vk.API(session, v='5.120')
-    group_id = 192858688
-    owner_id = -192858688
 
+    remove_all_items(owner_id,group_id)
+    preprocessed = preprocess()
     # album_id = 12
     for group_name, df in preprocessed.groupby('Группа'):
         print(f'Process group {group_name}')
@@ -79,7 +94,7 @@ def main():
                 album_ids=[album_id],
 
             )
-            time.sleep(1)
+            time.sleep(0.3)
 
 
 def upload_photo(api, group_id, filename):
@@ -150,7 +165,6 @@ def preprocess():
     print(df2.head())
     print(sizes_set)
     print(len(sizes_set))
-    1/0
     return df2
 
 
