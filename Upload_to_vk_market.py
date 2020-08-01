@@ -29,7 +29,7 @@ group_id = 192858688
 owner_id = -group_id
 
 
-def remove_all_items(owner_id, group_id):
+def remove_all_items(owner_id):
     count=api.market.get(owner_id=owner_id,count=0,offset=0).count
     step=200
     while count>0:
@@ -40,7 +40,21 @@ def remove_all_items(owner_id, group_id):
         for item in tqdm(items):
             item_id=item.id
             q=api.market.delete(owner_id=owner_id,item_id=item_id)
-            time.sleep(0.3)
+            time.sleep(0.2)
+
+
+def remove_all_albums(owner_id):
+    count=api.market.getAlbums(owner_id=owner_id,count=0,offset=0).count
+    step=100
+    while count>0:
+        res=api.market.getAlbums(owner_id=owner_id,count=step,offset=0)
+        count=res['count']
+        items=res['items']
+        print(count)
+        for album in tqdm(items):
+            album_id=album.id
+            q=api.market.deleteAlbum(owner_id=owner_id,album_id=album_id)
+            time.sleep(0.2)
 
 def main():
 
@@ -142,7 +156,7 @@ def download_all_photo(df):
 
 
 def preprocess():
-    df = pd.read_excel('./File/Выгрузка в ВК.xlsx')
+    df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
     # df = df[df['НГруппа'] == 'ЗИМА_(верхняя_одежда)']
     sizes_set=set()
     df2 = pd.DataFrame()
@@ -173,5 +187,6 @@ def preprocess():
 
 
 if __name__ == '__main__':
-    remove_all_items(owner_id,group_id)
+    remove_all_items(owner_id)
+    remove_all_albums(owner_id)
     main()

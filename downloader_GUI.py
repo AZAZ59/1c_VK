@@ -205,10 +205,10 @@ class MyFirstGUI:
         self.process_status.pack()
 
     def create_wigets(self):
-        self.master.title("Загрузка альбома")
+        self.master.title("Загрузка альбома из ВКонтакте в Excel файл")
 
         self.group_id_frame = Frame(self.master)
-        self.group_id_label = Label(self.group_id_frame, text="id группы: ")
+        self.group_id_label = Label(self.group_id_frame, text="id группы альбома : ")
         self.group_id = Entry(self.group_id_frame)
         self.group_id.insert(END, '-182912257')
 
@@ -216,10 +216,11 @@ class MyFirstGUI:
         self.album_id_label = Label(self.album_id_frame,
                                     text="id альбомов через ',' ( оставить пустым для скачивания всех альбомов): ")
         self.album_id = Entry(self.album_id_frame)
-        self.album_id.insert(END, '272262579')
+        self.album_id.insert(END, '')
 
         self.file_frame = Frame(self.master)
-        self.output_file = Button(self.file_frame, text="Каталог для сохранения", command=self.select_save_file)
+
+        self.output_file = Button(self.file_frame, text="Каталог для сохранения результата", command=self.select_save_file)
         self.selected_save_file = Label(self.file_frame, text="")
 
         self.process_button = Button(self.master, text="Начать обработку", command=self.process)
@@ -236,14 +237,14 @@ class MyFirstGUI:
         split_marker = set(x.lower().strip() for x in open('./split_markers.txt', encoding='utf-8').readlines())
         art_split_markers = set(x.lower().strip() for x in open('./art_markers.txt', encoding='utf-8').readlines())
 
-        pprint(split_marker)
-        pprint(art_split_markers)
+#       pprint(split_marker)
+#       pprint(art_split_markers)
 
         print("process_file")
         self.process_status['text'] = 'В обработке'
-        download_vk_album(self.group_id.get(), self.album_id.get(), self.save_dir)
+        download_vk_album(self.group_id.get(), self.album_id.get(), self.save_dir )
 
-        merge_excel()
+        merge_excel(self.save_dir)
 
         self.process_status['text'] = 'Обработка завершена'
         # process_files(self.price_file,self.blank_file,self.out_file,self.log)

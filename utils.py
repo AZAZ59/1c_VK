@@ -87,13 +87,14 @@ def clear_file(file):
     f.close()
 
 
-def merge_excel():
+def merge_excel(save_dir):
     import glob
     big_df = pd.DataFrame()
-    for file in tqdm(glob.glob('./res/_processed_*')):
-        df = pd.read_excel(file, index_col=0)
-        big_df = big_df.append(df, ignore_index=True)
-    big_df.to_excel('./_processed_FULL.xlsx', index=False)
+    for file in tqdm(glob.glob(f'./res/_processed_*')):
+        if '_VK_1C.xlsx' not in file:
+            df = pd.read_excel(file, index_col=0)
+            big_df = big_df.append(df, ignore_index=True)
+    big_df.to_excel(f'./File/_VK_1C.xlsx', index=False)
 
 
 if __name__ == '__main__':
