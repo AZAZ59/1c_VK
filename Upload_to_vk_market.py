@@ -109,7 +109,7 @@ def main():
                 album_ids=[album_id],
 
             )
-            time.sleep(0.3)
+            time.sleep(1.0)
 
 
 def upload_photo(api, group_id, filename):
