@@ -1,5 +1,4 @@
 import glob
-import numpy as np
 
 from utils import clear_file
 

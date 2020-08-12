@@ -10,15 +10,7 @@ from tqdm import tqdm
 
 # dct = DotDict(dct)
 from config import session
-from utils import Request_new, VK_Item, merge_excel
-
-
-split_marker = set(x.lower().strip() for x in open('./split_markers.txt', encoding='utf-8').readlines())
-art_split_markers = set(" "+(x.lower().strip()) for x in open('./art_markers.txt', encoding='utf-8').readlines())
-
-pprint(split_marker)
-pprint(art_split_markers)
-
+from utils import VK_Item, merge_excel, art_split_markers, split_marker
 
 def process_photo_batch(photos):
     batch_items = []
@@ -103,7 +95,7 @@ def process_to_1c(df, save_dir, name):
         "Размер",
         'Состав',
         'Розничная',
-  #     "new_name",
+        #     "new_name",
         "Вид номенклатуры"
     ])
     global error_out, art_out
@@ -131,15 +123,16 @@ def process_to_1c(df, save_dir, name):
             art = art.replace('?', '').strip()
 
             df2 = df2.append({
-                "Картинка"             : row['photo_url'] if ind1 == 0 else '',
-                "Ссылка на товар"      : row['link'] if ind1 == 0 else '',
-                "Номенклатура"         : art_new,
-                "Наименование полное"  : art,
-                "Размер"               : size,
-                'Состав'               : ((data_cols[-3]+" ") if len(data_cols) >= 3 else "") + (data_cols[-2] if len(data_cols) >= 2 else ""),
-                'Розничная'                 : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
-    #           "new_name"             : name_new,
-                "Вид номенклатуры"     : name
+                "Картинка"           : row['photo_url'] if ind1 == 0 else '',
+                "Ссылка на товар"    : row['link'] if ind1 == 0 else '',
+                "Номенклатура"       : art_new,
+                "Наименование полное": art,
+                "Размер"             : size,
+                'Состав'             : ((data_cols[-3] + " ") if len(data_cols) >= 3 else "") + (
+                    data_cols[-2] if len(data_cols) >= 2 else ""),
+                'Розничная'          : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
+                #           "new_name"             : name_new,
+                "Вид номенклатуры"   : name
             }, ignore_index=True)
 
     error_out.close()
@@ -148,6 +141,7 @@ def process_to_1c(df, save_dir, name):
         return
     else:
         df2.to_excel(f'{save_dir}/_processed_{name}.xlsx')
+        return f'{save_dir}/_processed_{name}.xlsx'
 
 
 def download_vk_album(group_id, album_id, save_dir):
@@ -159,6 +153,8 @@ def download_vk_album(group_id, album_id, save_dir):
         group_id = -group_id
 
     albums = api.photos.getAlbums(owner_id=group_id, album_ids=album_id)['items']
+
+    result_files = []
 
     for album in tqdm(albums, desc='___ALBUMS___'):
         album_items = []
@@ -177,9 +173,10 @@ def download_vk_album(group_id, album_id, save_dir):
 
         name = album["title"].replace(" ", "_").replace("/", "-")
         df.to_excel(f'{save_dir}/{name}.xlsx')
-
-        process_to_1c(df, save_dir, name)
-    pass
+        processed_file = process_to_1c(df, save_dir, name)
+        result_files.append(f'{save_dir}/{name}.xlsx')
+        result_files.append(processed_file)
+    return result_files
 
 
 class MyFirstGUI:
@@ -233,12 +230,6 @@ class MyFirstGUI:
         self.selected_save_file['text'] = 'Каталог для сохранения:\n ' + self.save_dir
 
     def process(self):
-        split_marker = set(x.lower().strip() for x in open('./split_markers.txt', encoding='utf-8').readlines())
-        art_split_markers = set(x.lower().strip() for x in open('./art_markers.txt', encoding='utf-8').readlines())
-
-        pprint(split_marker)
-        pprint(art_split_markers)
-
         print("process_file")
         self.process_status['text'] = 'В обработке'
         download_vk_album(self.group_id.get(), self.album_id.get(), self.save_dir)
@@ -248,9 +239,8 @@ class MyFirstGUI:
         self.process_status['text'] = 'Обработка завершена'
         # process_files(self.price_file,self.blank_file,self.out_file,self.log)
 
+if __name__ == '__main__':
 
-
-
-root = Tk()
-my_gui = MyFirstGUI(root)
-root.mainloop()
+    root = Tk()
+    my_gui = MyFirstGUI(root)
+    root.mainloop()

@@ -11,7 +11,6 @@ import urllib3
 
 logging.basicConfig(level=logging.INFO)
 # logging.basicConfig(level=logging.DEBUG)
-import vk
 from tqdm import tqdm
 
 from config import *
@@ -30,21 +29,21 @@ owner_id = -group_id
 
 
 def remove_all_items(owner_id, group_id):
-    count=api.market.get(owner_id=owner_id,count=0,offset=0).count
-    step=200
-    while count>0:
-        res=api.market.get(owner_id=owner_id,count=step,offset=0)
-        count=res['count']
-        items=res['items']
+    count = api.market.get(owner_id=owner_id, count=0, offset=0).count
+    step = 200
+    while count > 0:
+        res = api.market.get(owner_id=owner_id, count=step, offset=0)
+        count = res['count']
+        items = res['items']
         print(count)
         for item in tqdm(items):
-            item_id=item.id
-            q=api.market.delete(owner_id=owner_id,item_id=item_id)
+            item_id = item.id
+            q = api.market.delete(owner_id=owner_id, item_id=item_id)
             time.sleep(0.3)
 
-def main():
 
-    remove_all_items(owner_id,group_id)
+def main():
+    remove_all_items(owner_id, group_id)
     preprocessed = preprocess()
     # album_id = 12
     for group_name, df in preprocessed.groupby('Группа'):
@@ -58,7 +57,7 @@ def main():
 
         for ind, row in tqdm(df.iterrows(), total=len(df)):
             description = row['Описание']
-            filename=''.join([q if str.isalnum(q) else ' ' for q in row['Наименование'] ])
+            filename = ''.join([q if str.isalnum(q) else ' ' for q in row['Наименование']])
             filename = f'./dir_to_send/{filename}.jpg'
 
             if pd.isna(filename[0]):
@@ -104,7 +103,6 @@ def upload_photo(api, group_id, filename):
     resp_json = {}
     upload_url = api.photos.getMarketUploadServer(group_id=group_id, main_photo=1)['upload_url']
 
-
     for k in range(10):
         try:
             for i in range(15):
@@ -130,11 +128,11 @@ def upload_photo(api, group_id, filename):
 
 def download_all_photo(df):
     photo = df['Фото']
-    filename = df['Наименование'].apply(lambda x:''.join([q if str.isalnum(q) else ' ' for q in x ]))
+    filename = df['Наименование'].apply(lambda x: ''.join([q if str.isalnum(q) else ' ' for q in x]))
 
-    url_name=list(zip(photo,filename))
+    url_name = list(zip(photo, filename))
 
-    print('start download photo','count = ',len(url_name))
+    print('start download photo', 'count = ', len(url_name))
     part_download_photo = partial(download_photo)
     download_pool = Pool(16)
     download_pool.starmap(download_photo, url_name)
@@ -145,7 +143,7 @@ def download_all_photo(df):
 def preprocess():
     df = pd.read_excel('./File/Выгрузка в ВК.xlsx')
     # df = df[df['НГруппа'] == 'ЗИМА_(верхняя_одежда)']
-    sizes_set=set()
+    sizes_set = set()
     df2 = pd.DataFrame()
     for name, group in tqdm(df.groupby('Наименование')):
         sizes_set.update(set([str(x) for x in list(group['Характеристика'])]))
@@ -155,7 +153,6 @@ def preprocess():
             description += f'Размеры: {sizes}\n'
         if str(group["Состав"].iloc[0]) != 'nan':
             description += f'Состав: {str(group["Состав"].iloc[0])}\n'
-
 
         if 'https' in str(group['Фото'].iloc[0]):
             df2 = df2.append({

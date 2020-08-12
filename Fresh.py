@@ -3,14 +3,13 @@ from enum import Enum
 from typing import List
 
 import pandas as pd
-import urllib3
 from bs4 import BeautifulSoup
 
 
 def tryParse(value):
     try:
-        return float(value)>0
-#        return True
+        return float(value) > 0
+    #        return True
     except ValueError:
         return False
 
@@ -24,6 +23,7 @@ class Item_row:
     sizes: List[str] = field(default_factory=list)
     availabels: List[List[bool]] = field(default_factory=list)
     imgs: List[str] = field(default_factory=list)
+
 
 @dataclass
 class Item:
@@ -41,8 +41,7 @@ class State(Enum):
     Description = 2
 
 
-
-def parse_file(filename)->List[Item_row] :
+def parse_file(filename) -> List[Item_row]:
     soup = BeautifulSoup(open(filename, encoding='1251'), 'html.parser')
     item_list = []
     cur_item = None
@@ -52,7 +51,7 @@ def parse_file(filename)->List[Item_row] :
             cur_state = State.Description
 
         if cur_state == State.Init and len(row.select('td')) > 1:
-            name = row.select('td')[0].text.strip().strip('\n').replace('\n','')
+            name = row.select('td')[0].text.strip().strip('\n').replace('\n', '')
             cost = row.select('td')[1].text.replace(',', '.').replace(' ', '')
 
             if tryParse(cost):  # Начало
@@ -85,38 +84,38 @@ def parse_file(filename)->List[Item_row] :
 
 
 def main():
-    filename='./InputPrice/sheet001.htm'
+    filename = './InputPrice/sheet001.htm'
 
     item_list = parse_file(filename)
 
-    items=[]
+    items = []
     for item in item_list:
-        for ind,color in enumerate(item.color):
-            new_item=Item(
-                name            = item.name + ' ' + item.color[ind],
-                cost            = item.cost,
-                description     = item.description,
-                color           = item.color[ind],
-                availabel_sizes = ', '.join ([size for ind1,size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                imgs_str        = ', '.join (item.imgs)
+        for ind, color in enumerate(item.color):
+            new_item = Item(
+                name=item.name + ' ' + item.color[ind],
+                cost=item.cost,
+                description=item.description,
+                color=item.color[ind],
+                availabel_sizes=', '.join([size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                imgs_str=', '.join(item.imgs)
             )
             items.append(new_item)
 
     df = pd.DataFrame([asdict(x) for x in items])
     print(df.columns)
 
-    df["Вид номенклатуры"]="CLEVER"
+    df["Вид номенклатуры"] = "CLEVER"
 
-    df.columns=['Номенклатура', 'Розничная', 'Описание', 'Состав', 'Размер', 'Картинка', "Вид номенклатуры"]
+    df.columns = ['Номенклатура', 'Розничная', 'Описание', 'Состав', 'Размер', 'Картинка', "Вид номенклатуры"]
 
     writer = pd.ExcelWriter("./File/_Fresh_1C.xlsx", engine='xlsxwriter')
-    df.to_excel(writer,index=False)
+    df.to_excel(writer, index=False)
 
-    workbook  = writer.book
+    workbook = writer.book
     worksheet = writer.sheets['Sheet1']
 
     worksheet.set_column('A:A', 55)
-    worksheet.set_column('B:B',  8)
+    worksheet.set_column('B:B', 8)
     worksheet.set_column('C:C', 25)
     worksheet.set_column('D:D', 25)
     worksheet.set_column('E:E', 25)

@@ -1,18 +1,15 @@
 import time
-from functools import partial
 from multiprocessing import Pool
 
 import pandas as pd
 import requests
 import urllib3
-# logging.basicConfig(level=logging.DEBUG)
-
-import vk
 from tqdm import tqdm
 
 from config import *
-
 from utils import CannotUploadPhotoException, download_photo
+
+# logging.basicConfig(level=logging.DEBUG)
 
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.max_columns', 1000)
@@ -36,7 +33,7 @@ def main():
         upload_url = api.photos.getUploadServer(album_id=album_id, group_id=group_id)['upload_url']
         for ind, row in tqdm(df.iterrows(), total=len(df)):
             description = row['Описание']
-            filename=''.join([q if str.isalnum(q) else ' ' for q in row['Наименование']])
+            filename = ''.join([q if str.isalnum(q) else ' ' for q in row['Наименование']])
             filename = f'./dir_to_send/{filename}.jpg'
 
             if pd.isna(filename[0]):
@@ -52,9 +49,8 @@ def main():
                                     )
                     break
                 except Exception as e:
-                    print(e, 'sleep ', 3*i, 'sec')
-                    time.sleep(3*i)
-
+                    print(e, 'sleep ', 3 * i, 'sec')
+                    time.sleep(3 * i)
 
 
 def upload_photo(api, group_id, album_id, filename, upload_url):
@@ -69,7 +65,7 @@ def upload_photo(api, group_id, album_id, filename, upload_url):
                 resp_json = resp.json()
                 photo_list = resp_json['photos_list']
                 if photo_list == "[]":
-                    print(filename,resp_json, resp.raw, resp, 'sleep', i)
+                    print(filename, resp_json, resp.raw, resp, 'sleep', i)
                     time.sleep(i)
                     continue
                 else:
@@ -86,10 +82,10 @@ def upload_photo(api, group_id, album_id, filename, upload_url):
 
 def download_all_photo(df):
     photo = df['Фото']
-    filename = df['Наименование'].apply(lambda x:''.join([q if str.isalnum(q) else ' ' for q in x ]))
-    url_name=list(zip(photo,filename))
-    
-    print('start download photo','count = ',len(url_name))
+    filename = df['Наименование'].apply(lambda x: ''.join([q if str.isalnum(q) else ' ' for q in x]))
+    url_name = list(zip(photo, filename))
+
+    print('start download photo', 'count = ', len(url_name))
     download_pool = Pool(16)
     download_pool.starmap(download_photo, url_name)
     download_pool.close()
@@ -97,7 +93,7 @@ def download_all_photo(df):
 
 
 def preprocess():
-#    df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
+    #    df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
     df = pd.read_excel('./File/Выгрузка в ВК.xlsx')
     df2 = pd.DataFrame()
     for name, group in tqdm(df.groupby('Наименование')):
