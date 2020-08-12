@@ -93,8 +93,8 @@ def download_all_photo(df):
 
 
 def preprocess():
-        df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
-#   df = pd.read_excel('./File/Выгрузка в ВК.xlsx')
+     #   df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
+    df = pd.read_excel('./File/Выгрузка в ВК.xlsx')
     df2 = pd.DataFrame()
     for name, group in tqdm(df.groupby('Наименование')):
         sizes = ', '.join([str(x) for x in list(group['Характеристика'])])
