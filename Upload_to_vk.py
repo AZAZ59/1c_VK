@@ -96,10 +96,10 @@ def preprocess():
      #   df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
     df = pd.read_excel('./File/Выгрузка в ВК.xlsx')
     df2 = pd.DataFrame()
-    for name, group in tqdm(df.groupby('Наименование')):
+    for name, group in tqdm(df.groupby('Артикул')):
         sizes = ', '.join([str(x) for x in list(group['Характеристика'])])
         description = ''
-        description += f'Артикул: {name}\n'
+        description += f'Артикул: {group["Наименование"].iloc[0]}\n'
         if len(sizes) != 0 and sizes != 'nan':
             description += f'Размеры: {sizes}\n'
         if str(group["Состав"].iloc[0]) != 'nan':
@@ -110,7 +110,7 @@ def preprocess():
 
         if 'http' in str(group['Фото'].iloc[0]):
             df2 = df2.append({
-                'Наименование': str(name),
+                'Наименование': str(group['Наименование'].iloc[0]),
                 'Описание'    : description,
                 'Фото'        : str(group['Фото'].iloc[0]),
                 'Группа'      : str(group['НГруппа'].iloc[0]),
