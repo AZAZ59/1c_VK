@@ -1,3 +1,6 @@
+#  14/08/2020 Проверить обработку цен - когда цены нет, выгружается или нет . Нужно выгружать всегда 
+# КВ 20145/ш/белый - без цены выгрузился !
+
 from dataclasses import asdict
 from pprint import pprint
 from tkinter import *
@@ -8,8 +11,10 @@ import vk
 import vk.api
 from tqdm import tqdm
 
-# dct = DotDict(dct)
-from config import session
+# from config import session
+# session Ксении
+session  = vk.Session('c297dec325e43588e5472b7331c343760072c052abe7a0c90725f86e7bce440a9a2175629003e34c83916')
+
 from utils import VK_Item, merge_excel, art_split_markers, split_marker
 
 def process_photo_batch(photos):
@@ -86,7 +91,7 @@ def extract_correnct_art_and_name(art: str):
     return art, '________NOT_FOUND__________'
 
 
-def process_to_1c(df, save_dir, name):
+def process_to_1c(df, save_dir, name, name_album):
     df2 = pd.DataFrame(columns=[
         "Картинка",
         "Ссылка на товар",
@@ -95,12 +100,11 @@ def process_to_1c(df, save_dir, name):
         "Размер",
         'Состав',
         'Розничная',
-        #     "new_name",
         "Вид номенклатуры"
     ])
     global error_out, art_out
     error_out = open(f'./errors/{name}.txt', 'w', encoding='utf-8')
-    art_out = open(f'./art/{name}.txt', 'w', encoding='utf-8')
+    art_out   = open(f'./art/{name}.txt'   , 'w', encoding='utf-8')
     for ind, row in tqdm(df.iterrows(), total=len(df)):
 
         raw_data = str(row['description']).split('\n')
@@ -109,9 +113,9 @@ def process_to_1c(df, save_dir, name):
 
         for ind1, art in enumerate(rows):
             all_sizes, art, size = get_sizes(art, rows)
-            art_new, name_new = extract_correnct_art_and_name(art)
+            art_new  , name_new  = extract_correnct_art_and_name(art)
 
-            if len(data_cols) < 1:
+            if len(data_cols) == 0:
                 continue
             try:
                 data_cols[-1] = int(
@@ -131,8 +135,7 @@ def process_to_1c(df, save_dir, name):
                 'Состав'             : ((data_cols[-3] + " ") if len(data_cols) >= 3 else "") + (
                     data_cols[-2] if len(data_cols) >= 2 else ""),
                 'Розничная'          : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
-                #           "new_name"             : name_new,
-                "Вид номенклатуры"   : name
+                "Вид номенклатуры"   : name_album
             }, ignore_index=True)
 
     error_out.close()
@@ -141,8 +144,7 @@ def process_to_1c(df, save_dir, name):
         return
     else:
         df2.to_excel(f'{save_dir}/_processed_{name}.xlsx')
-        return f'{save_dir}/_processed_{name}.xlsx'
-
+    return f'{save_dir}/_processed_{name}.xlsx'
 
 def download_vk_album(group_id, album_id, save_dir):
     api = vk.API(session, v='5.92')
@@ -171,13 +173,16 @@ def download_vk_album(group_id, album_id, save_dir):
 
         df = pd.DataFrame(list(map(asdict, album_items)))
 
-        name = album["title"].replace(" ", "_").replace("/", "-")
+        name_album = album["title"]
+        name       = album["title"].replace(" ", "_").replace("/", "-")
         df.to_excel(f'{save_dir}/{name}.xlsx')
-        processed_file = process_to_1c(df, save_dir, name)
+
+        processed_file = process_to_1c(df, save_dir, name, name_album)
+
         result_files.append(f'{save_dir}/{name}.xlsx')
         result_files.append(processed_file)
-    return result_files
 
+    return result_files
 
 class MyFirstGUI:
     def __init__(self, master):
@@ -207,7 +212,7 @@ class MyFirstGUI:
         self.group_id_frame = Frame(self.master)
         self.group_id_label = Label(self.group_id_frame, text="id группы альбома : ")
         self.group_id = Entry(self.group_id_frame)
-        self.group_id.insert(END, '-182912257')
+        self.group_id.insert(END, '-182912257') 
 
         self.album_id_frame = Frame(self.master)
         self.album_id_label = Label(self.album_id_frame,
@@ -221,7 +226,6 @@ class MyFirstGUI:
         self.selected_save_file = Label(self.file_frame, text="")
 
         self.process_button = Button(self.master, text="Начать обработку", command=self.process)
-
         self.process_status = Label(self.master, text="...")
 
         self.save_dir = './res'
@@ -238,7 +242,6 @@ class MyFirstGUI:
         merge_excel(self.save_dir)
 
         self.process_status['text'] = 'Обработка завершена'
-        # process_files(self.price_file,self.blank_file,self.out_file,self.log)
 
 if __name__ == '__main__':
 

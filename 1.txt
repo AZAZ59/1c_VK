@@ -1,7 +1,7 @@
-# 14/08/2020 РџСЂРѕРІРµСЂРёС‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ С†РµРЅ - РµСЃР»Рё С†РµРЅР° РІ РєРѕРї ? РѕРєСЂСѓРіР»РёС‚СЊ ?
-# Р’ РїСЂР°Р№СЃРµ             Рљ 1064/РІРµСЃРµР»РѕРµ РјРѕСЂРѕР¶РµРЅРѕРµ РЅР° Р±РµР»РѕРј	 169,5
-# Р’ С„Р°Р№Р»Рµ РґР»СЏ Р·Р°РіСЂСѓР·РєРµ Рљ 1064/РІРµСЃРµР»РѕРµ РјРѕСЂРѕР¶РµРЅРѕРµ РЅР° Р±РµР»РѕРј         169,5	Р РёР±Р°РЅР°, 100% С…Р»РѕРїРѕРє	Р‘Р•Р›Р¬Р•_
-# Р’ Р°Р»СЊР±РѕРјРµ Р’Рљ         Рљ 1064/РІРµСЃРµР»РѕРµ РјРѕСЂРѕР¶РµРЅРѕРµ РЅР° Р±РµР»РѕРј   Р¦РµРЅР°: 169 СЂСѓР±.
+# 14/08/2020 Проверить обработку цен - если цена в коп ? округлить ?
+# В прайсе             К 1064/веселое мороженое на белом	 169,5
+# В файле для загрузке К 1064/веселое мороженое на белом         169,5	Рибана, 100% хлопок	БЕЛЬЕ_
+# В альбоме ВК         К 1064/веселое мороженое на белом   Цена: 169 руб.
 
 import time
 from multiprocessing import Pool
@@ -24,34 +24,30 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def main():
 
+    preprocessed = preprocess()
+
     api = vk.API(session, v='5.92')
 
-    df2 = pd.read_excel('./File/РђР»СЊР±РѕРјС‹ РґР»СЏ Р’Рљ.xlsx')
-
-    for group_name, df in df2.groupby('Р“СЂСѓРїРїР°'):
+    for group_name, df in preprocessed.groupby('Группа'):
         print(f'Process group {group_name}')
         # create album
 
-        album    = api.photos.createAlbum(title=group_name, group_id=group_id, description="Р”РѕР±Р°РІР»РµРЅРѕ 16 Р°РІРіСѓСЃС‚Р°")
+        album    = api.photos.createAlbum(title=group_name, group_id=group_id, description="Добавлено 16 августа")
         album_id = album.id
 
         download_all_photo(df)
 
         upload_url = api.photos.getUploadServer(album_id=album_id, group_id=group_id)['upload_url']
-
         for ind, row in tqdm(df.iterrows(), total=len(df)):
-            description = row['РћРїРёСЃР°РЅРёРµ']
-            filename    = ''.join([q if str.isalnum(q) else ' ' for q in row['РќР°РёРјРµРЅРѕРІР°РЅРёРµ']])
+            description = row['Описание']
+            filename    = ''.join([q if str.isalnum(q) else ' ' for q in row['Наименование']])
             filename    = f'./dir_to_send/{filename}.jpg'
 
             if pd.isna(filename[0]):
-                print(f'РћС€РёР±РєР°! Р’ СЃС‚СЂРѕРєРµ {ind + 2} РЅРµС‚ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ')
+                print(f'Ошибка! В строке {ind + 2} нет изображения')
                 continue
 
             resp_json = upload_photo(api, group_id, album_id, filename, upload_url)
-
-# РµСЃР»Рё РІ РЅР°Р·РІР°РЅРёРё С„Р°Р№Р»Р° РµСЃС‚СЊ СЃР»РѕРІР° "РћР±Р»РѕР¶РєР° Р°Р»СЊР±РѕРјР°", С‚Рѕ photos.makeCover owner_id photo_id album_id - Р”РµР»Р°РµС‚ С„РѕС‚РѕРіСЂР°С„РёСЋ РѕР±Р»РѕР¶РєРѕР№ Р°Р»СЊР±РѕРјР°
-
             for i in range(100):
                 try:
                     api.photos.save(album_id    = album_id, 
@@ -95,8 +91,8 @@ def upload_photo(api, group_id, album_id, filename, upload_url):
 
 
 def download_all_photo(df):
-    photo    = df['Р¤РѕС‚Рѕ']
-    filename = df['РќР°РёРјРµРЅРѕРІР°РЅРёРµ'].apply(lambda x: ''.join([q if str.isalnum(q) else ' ' for q in x]))
+    photo = df['Фото']
+    filename = df['Наименование'].apply(lambda x: ''.join([q if str.isalnum(q) else ' ' for q in x]))
     url_name = list(zip(photo, filename))
 
     print('start download photo', 'count = ', len(url_name))
@@ -104,6 +100,35 @@ def download_all_photo(df):
     download_pool.starmap(download_photo, url_name)
     download_pool.close()
     print('photos downloaded')
+
+
+def preprocess():
+   df  = pd.read_excel('./File/Выгрузка в ВК.xlsx')
+   df2 = pd.DataFrame()
+   for name, group in tqdm(df.groupby('Артикул')):
+        sizes = ', '.join([str(x) for x in list(group['Характеристика'])])
+        description = ''
+        description += f'Артикул: {group["Наименование"].iloc[0]}\n'
+        if len(sizes) != 0 and sizes != 'nan':
+            description += f'Размеры: {sizes}\n'
+        if str(group["Состав"].iloc[0]) != 'nan':
+            description += f'Состав: {group["Состав"].iloc[0]}\n'
+
+        if str(group["Розничная"].iloc[0]) != 'nan':
+            description += f'Цена: {int(group["Розничная"].iloc[0])} руб.\n'
+
+        if 'http' in str(group['Фото'].iloc[0]):
+            df2 = df2.append({
+                'Наименование': str(group['Наименование'].iloc[0]),
+                'Описание'    : description,
+                'Фото'        : str(group['Фото'].iloc[0]),
+                'Группа'      : str(group['НГруппа'].iloc[0]),
+            }, ignore_index=True)
+        else:
+            print(str(group['Фото'].iloc[0]))
+   df2.to_excel('./File/to_album_vk.xlsx')
+   return df2
+
 
 if __name__ == '__main__':
     main()
