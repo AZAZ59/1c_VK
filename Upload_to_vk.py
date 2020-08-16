@@ -1,8 +1,3 @@
-# 14/08/2020 Проверить обработку цен - если цена в коп ? округлить ?
-# В прайсе             К 1064/веселое мороженое на белом	 169,5
-# В файле для загрузке К 1064/веселое мороженое на белом         169,5	Рибана, 100% хлопок	БЕЛЬЕ_
-# В альбоме ВК         К 1064/веселое мороженое на белом   Цена: 169 руб.
-
 import time
 from multiprocessing import Pool
 
@@ -50,8 +45,6 @@ def main():
 
             resp_json = upload_photo(api, group_id, album_id, filename, upload_url)
 
-# если в названии файла есть слова "Обложка альбома", то photos.makeCover owner_id photo_id album_id - Делает фотографию обложкой альбома
-
             for i in range(100):
                 try:
                     photo_resp=api.photos.save(album_id    = album_id, 
@@ -65,6 +58,9 @@ def main():
                 except Exception as e:
                     print(e, 'sleep ', 3 * i, 'sec')
                     time.sleep(3 * i)
+
+# Запиши фото в Обложка альбома
+
             if "Обложка альбома" in description:
                 photo_id=photo_resp[0]['id']
                 for i in range(100):
