@@ -7,6 +7,7 @@ import vk
 from tqdm import tqdm
 
 date_XX_XX_XXXX = '16_08_2020 '
+album_comment   = 'Добавлено 16 Августа'
 
 def retry(retries=3):
     def decorator(f):

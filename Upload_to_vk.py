@@ -7,7 +7,7 @@ import urllib3
 from tqdm import tqdm
 
 from config import *
-from utils import CannotUploadPhotoException, download_photo
+from utils import CannotUploadPhotoException, download_photo, date_XX_XX_XXXX, album_comment
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -21,13 +21,13 @@ def main():
 
     api = vk.API(session, v='5.92')
 
-    df2 = pd.read_excel('./File/Альбомы для ВК.xlsx')
+    df2 = pd.read_excel('./File/' + date_XX_XX_XXXX + 'Альбомы для ВК.xlsx')
 
     for group_name, df in df2.groupby('Группа'):
 
         print(f'Process group {group_name}')
         # create album
-        album    = api.photos.createAlbum(title=group_name, group_id=group_id, description="Добавлено 16 августа")
+        album    = api.photos.createAlbum(title=group_name, group_id=group_id, description=album_comment)
         album_id = album.id
 
         download_all_photo(df)
