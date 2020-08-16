@@ -6,7 +6,7 @@
 import pandas as pd
 from tqdm import tqdm
 
-from utils import extract_correnct_art_and_name, extract_art, extract_size
+from utils import extract_correnct_art_and_name, extract_art, extract_size, date_XX_XX_XXXX
 
 pd.options.display.max_colwidth =  40
 pd.options.display.max_columns  =  40
@@ -90,7 +90,7 @@ def main( ):
         } for x in group_data                                                        
         ],ignore_index=True)                                                         
                                                                                      
-    df_out.to_excel    ('./File/Товары для загрузки в ВК.xlsx')
+    df_out.to_excel    ('./File/' + date_XX_XX_XXXX + 'Товары для загрузки в ВК.xlsx')
     df  = df_out
     df2 = pd.DataFrame()
 
@@ -123,7 +123,7 @@ def main( ):
         else:
             print(str(group['Фото'].iloc[0]))
 
-    df2.to_excel('./File/Альбомы для ВК.xlsx')
+    df2.to_excel('./File/' + date_XX_XX_XXXX + 'Альбомы для ВК.xlsx')
 
 if __name__ == '__main__':
     main( )
