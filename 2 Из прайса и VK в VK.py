@@ -86,7 +86,7 @@ def main( ):
         ],ignore_index=True)                                                         
                                                                                      
     df_out.to_excel    ('./File/Товары для загрузки в ВК.xlsx')
-    df  = pd.read_excel('./File/Товары для загрузки в ВК.xlsx')
+    df  = df_out
     df2 = pd.DataFrame()
 
     for name, group in tqdm(df.groupby('Артикул')):
