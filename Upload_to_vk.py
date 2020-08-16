@@ -29,9 +29,9 @@ def main():
     df2 = pd.read_excel('./File/Альбомы для ВК.xlsx')
 
     for group_name, df in df2.groupby('Группа'):
+
         print(f'Process group {group_name}')
         # create album
-
         album    = api.photos.createAlbum(title=group_name, group_id=group_id, description="Добавлено 16 августа")
         album_id = album.id
 
@@ -54,7 +54,7 @@ def main():
 
             for i in range(100):
                 try:
-                    api.photos.save(album_id    = album_id, 
+                    photo_resp=api.photos.save(album_id    = album_id, 
                                     group_id    = group_id,
                                     server      = resp_json['server'], 
                                     photos_list = resp_json['photos_list'],
@@ -65,6 +65,19 @@ def main():
                 except Exception as e:
                     print(e, 'sleep ', 3 * i, 'sec')
                     time.sleep(3 * i)
+            if "Обложка альбома" in description:
+                photo_id=photo_resp[0]['id']
+                for i in range(100):
+                    try:
+                        photo_resp=api.photos.makeCover(
+                                        owner_id    = -group_id, 
+                                        photo_id    = photo_id,
+                                        album_id    = album_id
+                                        )
+                        break
+                    except Exception as e:
+                        print(e, 'sleep ', 3 * i, 'sec')
+                        time.sleep(3 * i)
 
 
 def upload_photo(api, group_id, album_id, filename, upload_url):

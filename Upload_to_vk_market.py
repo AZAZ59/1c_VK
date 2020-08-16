@@ -41,7 +41,6 @@ def remove_all_items(owner_id):
             q = api.market.delete(owner_id=owner_id, item_id=item_id)
             time.sleep(0.2)
 
-
 def remove_all_albums(owner_id):
     count=api.market.getAlbums(owner_id=owner_id,count=0,offset=0).count
     step=100
@@ -58,9 +57,9 @@ def remove_all_albums(owner_id):
 
 def main():
 
-    preprocessed = preprocess()
-    # album_id = 12
-    for group_name, df in preprocessed.groupby('Группа'):
+    df2 = pd.read_excel('./File/Альбомы для ВК.xlsx')
+
+    for group_name, df in df2.groupby('Группа'):
         print(f'Process group {group_name}')
         # create album
 
@@ -152,36 +151,6 @@ def download_all_photo(df):
     download_pool.starmap(download_photo, url_name)
     download_pool.close()
     print('photos downloaded')
-
-
-def preprocess():
-    df = pd.read_excel('./File/Выгрузка в ВК.xlsx',header=3).iloc[3:]
-    # df = df[df['НГруппа'] == 'ЗИМА_(верхняя_одежда)']
-    sizes_set = set()
-    df2 = pd.DataFrame()
-    for name, group in tqdm(df.groupby('Наименование')):
-        sizes_set.update(set([str(x) for x in list(group['Характеристика'])]))
-        sizes = ', '.join([str(x) for x in list(group['Характеристика'])])
-        description = ''
-        if len(sizes) != 0 and sizes != 'nan':
-            description += f'Размеры: {sizes}\n'
-        if str(group["Состав"].iloc[0]) != 'nan':
-            description += f'Состав: {str(group["Состав"].iloc[0])}\n'
-
-        if 'https' in str(group['Фото'].iloc[0]):
-            df2 = df2.append({
-                'Наименование': str(name),
-                'Описание'    : description,
-                'Фото'        : str(group['Фото'].iloc[0]),
-                'Группа'      : str(group['НГруппа'].iloc[0]),
-                'Цена'        : float(group["Розничная"].iloc[0])
-            }, ignore_index=True)
-        else:
-            print(str(group['Фото'].iloc[0]))
-    print(df2.head())
-    print(sizes_set)
-    print(len(sizes_set))
-    return df2
 
 
 if __name__ == '__main__':

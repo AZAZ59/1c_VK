@@ -107,6 +107,7 @@ def main( ):
                 'Описание'    : description,
                 'Фото'        : str(group['Фото'].iloc[0]),
                 'Группа'      : str(group['НГруппа'].iloc[0]),
+                'Цена'        : str(group['Розничная'].iloc[0]),
             }, ignore_index=True)
         else:
             print(str(group['Фото'].iloc[0]))
