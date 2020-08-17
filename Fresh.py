@@ -34,7 +34,6 @@ class Item:
     availabel_sizes: str = ""
     imgs_str: str = ""
 
-
 class State(Enum):
     Init = 0
     Available_Sizes = 1
@@ -72,6 +71,10 @@ def parse_file(filename) -> List[Item_row]:
                 sizes_availables.append(td.text != "")
             cur_item.availabels.append(sizes_availables)
 
+# для каждого цвета подставить разные фото
+# для "первого цвета" взять "первое фото"
+# для "второго цвета" взять "второе фото"
+# если "цветов" больше чем "фото", то бери первую фото
 
         elif cur_state == State.Description:
             cur_item.description = row.select('td')[0].text
@@ -93,8 +96,14 @@ def main():
     items = []
     for item in item_list:
         for ind, color in enumerate(item.color):
+
+# для каждого цвета подставить разные фото
+# для "первого цвета" взять "первое фото"
+# для "второго цвета" взять "второе фото"
+# если "цветов" больше чем "фото", то бери первую фото
+
             new_item = Item(
-                name=item.name + ' ' + item.color[ind],
+                name=item.name,
                 cost=item.cost,
                 description=item.description,
                 color=item.color[ind],
