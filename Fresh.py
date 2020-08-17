@@ -95,22 +95,29 @@ def main():
 
     items = []
     for item in item_list:
-        for ind, color in enumerate(item.color):
-
-# для каждого цвета подставить разные фото
-# для "первого цвета" взять "первое фото"
-# для "второго цвета" взять "второе фото"
-# если "цветов" больше чем "фото", то бери первую фото
-
-            new_item = Item(
-                name=item.name,
-                cost=item.cost,
-                description=item.description,
-                color=item.color[ind],
-                availabel_sizes=', '.join([size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                imgs_str=', '.join(item.imgs)
-            )
-            items.append(new_item)
+        if len(item.color)==len(item.imgs):
+            for ind, color in enumerate(item.color):
+                new_item = Item(
+                    name=item.name,
+                    cost=item.cost,
+                    description=item.description,
+                    color=item.color[ind],
+                    availabel_sizes=', '.join(
+                        [size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                    imgs_str=item.imgs[ind]
+                )
+                items.append(new_item)
+        else:
+            for ind, color in enumerate(item.color):
+                new_item = Item(
+                    name=item.name,
+                    cost=item.cost,
+                    description=item.description,
+                    color=item.color[ind],
+                    availabel_sizes=', '.join([size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                    imgs_str=item.imgs[0]
+                )
+                items.append(new_item)
 
     df = pd.DataFrame([asdict(x) for x in items])
     print(df.columns)
