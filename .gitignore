@@ -3,9 +3,8 @@
 /__pycache__/**
 /File/**
 /InputPrice/**
+/PriceFresh/**
 /**/*.xlsx
 *.jpg
 config.py
-sheet001.htm
 
-Выгрузка Заказов из магазина.txt

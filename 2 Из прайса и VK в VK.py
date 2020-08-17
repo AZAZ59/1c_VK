@@ -16,7 +16,7 @@ pd.options.display.width        = 222
 def main( ):
  
     from_file   = './InputPrice/Прайс_для_VK.xlsx'
-    result_file = './File/_VK_1C.xlsx'
+    result_file = './File/' + date_XX_XX_XXXX + '_VK_1C.xlsx'
     to_file     = 'w' 
 
     df = pd.read_excel(from_file)
@@ -104,7 +104,7 @@ def main( ):
             description += f'Состав: {group["Состав"].iloc[0]}\n'
 
         if str(group["Розничная"].iloc[0]) != 'nan':
-            description += f'Цена: {int(group["Розничная"].iloc[0])} руб.\n'
+            description += f'Цена: {float(group["Розничная"].iloc[0])} руб.\n'
 
 #           description += f'Цена: {group["Розничная"].iloc[0]} руб.\n'
 # В файле для загрузке К 1064/веселое мороженое на белом         169,5	Рибана, 100% хлопок	БЕЛЬЕ_  --- 169.5 .. другие цены в формате 1399.0

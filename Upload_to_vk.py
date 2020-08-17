@@ -27,7 +27,11 @@ def main():
 
         print(f'Process group {group_name}')
         # create album
-        album    = api.photos.createAlbum(title=group_name, group_id=group_id, description=album_comment)
+# privacy_view настройки приватности просмотра альбома 
+# privacy_commentнастройки приватности комментирования альбома в
+# upload_by_admins_only - 1 только
+
+        album    = api.photos.createAlbum(title=group_name, group_id=group_id, description=album_comment, privacy_view=all, privacy_comment=all, upload_by_admins_only=1, comments_disabled=1 )
         album_id = album.id
 
         download_all_photo(df)

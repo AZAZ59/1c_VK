@@ -99,10 +99,10 @@ def merge_excel(save_dir):
     import glob
     big_df = pd.DataFrame()
     for file in tqdm(glob.glob(f'./res/_processed_*')):
-        if '_VK_1C.xlsx' not in file:
+        if date_XX_XX_XXXX + '_VK_1C.xlsx' not in file:
             df = pd.read_excel(file, index_col=0)
             big_df = big_df.append(df, ignore_index=True)
-    big_df.to_excel(f'./File/_VK_1C.xlsx', index=False)
+    big_df.to_excel(f'./File/' + date_XX_XX_XXXX + '_VK_1C.xlsx', index=False)
     return './_processed_FULL.xlsx'
 
 
