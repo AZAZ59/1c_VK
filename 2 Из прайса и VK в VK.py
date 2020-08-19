@@ -16,7 +16,7 @@ pd.options.display.width        = 222
 def main( ):
  
     from_file   = './InputPrice/Прайс_для_VK.xlsx'
-    result_file = './File/' + date_XX_XX_XXXX + '_VK_1C.xlsx'
+    result_file = './File/' + date_XX_XX_XXXX + '/_VK_1C.xlsx'
     to_file     = 'w' 
 
     df = pd.read_excel(from_file)
@@ -90,21 +90,25 @@ def main( ):
         } for x in group_data                                                        
         ],ignore_index=True)                                                         
                                                                                      
-    df_out.to_excel    ('./File/' + date_XX_XX_XXXX + 'Товары для загрузки в ВК.xlsx')
+    df_out.to_excel    ('./File/' + date_XX_XX_XXXX + '/Товары для загрузки в ВК.xlsx')
     df  = df_out
     df2 = pd.DataFrame()
 
     for name, group in tqdm(df.groupby('Артикул')):
         sizes = ', '.join([str(x) for x in list(group['Характеристика'])])
         description = ''
+        size7       = ''
         description += f'Артикул: {group["Наименование"].iloc[0]}\n'
         if len(sizes) != 0 and sizes != 'nan':
-            description += f'Размеры: {sizes}\n'
+#           description += f'Размеры: {sizes}\n'
+            size7   += f' {sizes}' 
         if str(group["Состав"].iloc[0]) != 'nan':
-            description += f'Состав: {group["Состав"].iloc[0]}\n'
+            description += f'Состав: {group["Состав"].iloc[0]}'
+#        if str(group["Розничная"].iloc[0]) != 'nan':
+#            description += f'Цена: {float(group["Розничная"].iloc[0])} руб.\n'
 
-        if str(group["Розничная"].iloc[0]) != 'nan':
-            description += f'Цена: {float(group["Розничная"].iloc[0])} руб.\n'
+# 19082020 - в выгрузку добавляем размер и цену .. в Описание в выгрузку они не входят .. Объеденям здесь
+# 19082020 - для того чтобы в Товарах была информация о цене и размерах 
 
 #           description += f'Цена: {group["Розничная"].iloc[0]} руб.\n'
 # В файле для загрузке К 1064/веселое мороженое на белом         169,5	Рибана, 100% хлопок	БЕЛЬЕ_  --- 169.5 .. другие цены в формате 1399.0
@@ -115,15 +119,15 @@ def main( ):
             df2 = df2.append({
                 'Наименование': str(group['Наименование'].iloc[0]),
                 'Описание'    : description,
-                'Фото'        : str(group['Фото'].iloc[0]),
-                'Группа'      : str(group['НГруппа'].iloc[0]),
-# для Товаров нужна цена 
                 'Цена'        : str(group['Розничная'].iloc[0]),
+                'Размер'      : size7,
+                'Фото'        : str(group['Фото'].iloc[0]),
+                'Группа'      : str(group['НГруппа'].iloc[0])
             }, ignore_index=True)
         else:
             print(str(group['Фото'].iloc[0]))
 
-    df2.to_excel('./File/' + date_XX_XX_XXXX + 'Альбомы для ВК.xlsx')
+    df2.to_excel('./File/' + date_XX_XX_XXXX + '/Альбомы для ВК.xlsx')
 
 if __name__ == '__main__':
     main( )

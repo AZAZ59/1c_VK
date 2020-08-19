@@ -8,16 +8,17 @@ import pandas as pd
 import requests
 import urllib3
 
+
 logging.basicConfig(level=logging.INFO)
 # logging.basicConfig(level=logging.DEBUG)
 from tqdm import tqdm
 
 from config import *
 
-from utils import CannotUploadPhotoException, download_photo
+from utils  import CannotUploadPhotoException, download_photo, date_XX_XX_XXXX, album_comment
 
-pd.set_option('display.max_rows', 1000)
-pd.set_option('display.max_columns', 1000)
+pd.set_option('display.max_rows',     1000)
+pd.set_option('display.max_columns',  1000)
 pd.set_option('display.max_colwidth', 1000)
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -56,7 +57,7 @@ def remove_all_albums(owner_id):
 
 def main():
 
-    df2 = pd.read_excel('./File/Альбомы для ВК.xlsx')
+    df2 = pd.read_excel('./File/' + date_XX_XX_XXXX + '/Альбомы для ВК.xlsx')
 
     for group_name, df in df2.groupby('Группа'):
         print(f'Process group {group_name}')
@@ -68,7 +69,13 @@ def main():
         download_all_photo(df)
 
         for ind, row in tqdm(df.iterrows(), total=len(df)):
+# 19082020 - в выгрузку добавляем размер и цену .. в Описание в выгрузку они не входят .. Объеденям здесь
+# 19082020 - для того чтобы в Товарах была информация о цене и размерах 
             description = row['Описание']
+            size        = row['Размер']
+            cost        = row['Цена']  
+            description = description + '\nРазмер: ' + size + '\nЦена: '   + str(float(cost))
+
             filename = ''.join([q if str.isalnum(q) else ' ' for q in row['Наименование']])
             filename = f'./dir_to_send/{filename}.jpg'
 
@@ -84,27 +91,27 @@ def main():
                 continue
 
             save_resp = api.photos.saveMarketPhoto(
-                group_id=group_id,
-                photo=resp_json['photo'],
-                server=resp_json['server'],
-                hash=resp_json['hash'],
-                crop_data=resp_json['crop_data'],
-                crop_hash=resp_json['crop_hash'],
+                group_id      = group_id,
+                photo         = resp_json['photo'],
+                server        = resp_json['server'],
+                hash          = resp_json['hash'],
+                crop_data     = resp_json['crop_data'],
+                crop_hash     = resp_json['crop_hash'],
             )[0]
 
             add_resp = api.market.add(
-                owner_id=owner_id,
-                name=row['Наименование'],
-                description=description,
-                category_id=1,  # TODO get from list
-                price=row['Цена'],
-                main_photo_id=save_resp['id']
+                owner_id      = owner_id,
+                name          = row['Наименование'],
+                description   = description,
+                category_id   = 1,  # TODO get from list
+                price         = row['Цена'],
+                main_photo_id = save_resp['id']
             )
 
             api.market.addToAlbum(
-                owner_id=owner_id,
-                item_id=add_resp['market_item_id'],
-                album_ids=[album_id],
+                owner_id     = owner_id,
+                item_id      = add_resp['market_item_id'],
+                album_ids    = [album_id],
 
             )
             time.sleep(1.0)

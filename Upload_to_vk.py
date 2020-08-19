@@ -7,7 +7,7 @@ import urllib3
 from tqdm import tqdm
 
 from config import *
-from utils import CannotUploadPhotoException, download_photo, date_XX_XX_XXXX, album_comment
+from utils  import CannotUploadPhotoException, download_photo, date_XX_XX_XXXX, album_comment
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -21,7 +21,7 @@ def main():
 
     api = vk.API(session, v='5.92')
 
-    df2 = pd.read_excel('./File/' + date_XX_XX_XXXX + 'Альбомы для ВК.xlsx')
+    df2 = pd.read_excel('./File/' + date_XX_XX_XXXX + '/Альбомы для ВК.xlsx')
 
     for group_name, df in df2.groupby('Группа'):
 
@@ -39,7 +39,12 @@ def main():
         upload_url = api.photos.getUploadServer(album_id=album_id, group_id=group_id)['upload_url']
 
         for ind, row in tqdm(df.iterrows(), total=len(df)):
+# 19082020 - в выгрузку добавляем размер и цену .. в Описание в выгрузку они не входят .. Объеденям здесь
+# 19082020 - для того чтобы в Товарах была информация о цене и размерах 
             description = row['Описание']
+            size        = row['Размер']
+            cost        = row['Цена']  
+            description = description + '\nРазмер: ' + size + '\nЦена: '   + str(float(cost))
             filename    = ''.join([q if str.isalnum(q) else ' ' for q in row['Наименование']])
             filename    = f'./dir_to_send/{filename}.jpg'
 
@@ -64,7 +69,6 @@ def main():
                     time.sleep(3 * i)
 
 # Запиши фото в Обложка альбома
-
             if "Обложка альбома" in description:
                 photo_id=photo_resp[0]['id']
                 for i in range(100):

@@ -5,11 +5,12 @@ from typing import List
 import pandas as pd
 from bs4 import BeautifulSoup
 
+from utils import date_XX_XX_XXXX, album_comment
+
 
 def tryParse(value):
     try:
         return float(value) > 0
-    #        return True
     except ValueError:
         return False
 
@@ -33,6 +34,7 @@ class Item:
     color: str = ""
     availabel_sizes: str = ""
     imgs_str: str = ""
+
 
 class State(Enum):
     Init = 0
@@ -71,11 +73,6 @@ def parse_file(filename) -> List[Item_row]:
                 sizes_availables.append(td.text != "")
             cur_item.availabels.append(sizes_availables)
 
-# для каждого цвета подставить разные фото
-# для "первого цвета" взять "первое фото"
-# для "второго цвета" взять "второе фото"
-# если "цветов" больше чем "фото", то бери первую фото
-
         elif cur_state == State.Description:
             cur_item.description = row.select('td')[0].text
             imgs = row.select('a')
@@ -87,47 +84,71 @@ def parse_file(filename) -> List[Item_row]:
 
 
 def main():
-#   filename = './PriceFresh/1.files/sheet001.htm'
-    filename = 'sheet001.htm'
-
+    filename = './PriceFresh/1.files/sheet001.htm'
 
     item_list = parse_file(filename)
 
     items = []
     for item in item_list:
-        if len(item.color)==len(item.imgs):
+
+        if len(item.color) == len(item.imgs):
             for ind, color in enumerate(item.color):
                 new_item = Item(
-                    name=item.name,
-                    cost=item.cost,
-                    description=item.description,
-                    color=item.color[ind],
-                    availabel_sizes=', '.join(
-                        [size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                    imgs_str=item.imgs[ind]
+                        name=item.name  # Наименование
+                             + " " + item.color[ind],
+                        cost=item.cost,  # Цена
+                        description=item.name
+                                    + '\n' + item.description
+                                    + '\n' + item.color[ind],
+#                                    + '\nРазмер: ' + ', '.join(
+#                                [size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                        color=item.color[ind],  # Состав
+                        availabel_sizes=', '.join(
+                                [size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                        imgs_str=item.imgs[ind]
                 )
                 items.append(new_item)
         else:
             for ind, color in enumerate(item.color):
                 new_item = Item(
-                    name=item.name,
-                    cost=item.cost,
-                    description=item.description,
-                    color=item.color[ind],
-                    availabel_sizes=', '.join([size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                    imgs_str=item.imgs[0]
+                        name=item.name  # Наименование
+                             + " " + item.color[ind],
+                        cost=item.cost,  # Цена
+                        description=item.name
+                                    + '\n' + item.description
+                                    + '\n' + item.color[ind],
+                        color=item.color[ind],
+                        availabel_sizes=', '.join(
+                                [size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                        imgs_str=item.imgs[0]
                 )
                 items.append(new_item)
 
     df = pd.DataFrame([asdict(x) for x in items])
+
     print(df.columns)
 
     df["Вид номенклатуры"] = "CLEVER"
 
-    df.columns = ['Номенклатура', 'Розничная', 'Описание', 'Состав', 'Размер', 'Картинка', "Вид номенклатуры"]
+    df.columns = ['Наименование',
+                  'Цена',
+                  'Описание',
+                  'Состав',
+                  'Размер',
+                  'Фото',
+                  'Группа']
 
-#   writer = pd.ExcelWriter("./PriceFresh/_Fresh_1C.xlsx", engine='xlsxwriter')
-    writer = pd.ExcelWriter("Fresh_1C.xlsx", engine='xlsxwriter')
+    df = df[[
+            'Наименование',
+            'Описание',
+            #                 'Состав',
+            'Размер',
+            'Цена',
+            'Фото',
+            'Группа'
+             ]]
+
+    writer = pd.ExcelWriter("./File/" + date_XX_XX_XXXX + "/Альбомы для ВК.xlsx", engine='xlsxwriter')
     df.to_excel(writer, index=False)
 
     workbook = writer.book

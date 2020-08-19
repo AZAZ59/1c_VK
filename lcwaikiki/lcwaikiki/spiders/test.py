@@ -8,11 +8,12 @@ class TestSpider(scrapy.Spider):
     name = 'test'
     base_url = 'https://www.lcwaikiki.com'
     allowed_domains = ['www.lcwaikiki.com']
-    # start_urls = ['https://www.lcwaikiki.com/tr-TR/TR/etiket/bebek-sloganli-tulumlar/']
+#    start_urls = ['https://www.lcwaikiki.com/tr-TR/TR/etiket/bebek-sloganli-tulumlar/']
     start_urls = [
         'https://www.lcwaikiki.com/tr-TR/TR/ajax/Tag/TagPageData?CountryCode=TR&Tag=bebek-sloganli-tulumlar&PageIndex=1']
 
     def parse(self, response):
+
         resp_json = response.json()
         all_items_links = [self.base_url + x['ModelUrl'] for x in resp_json['CatalogList']['Items']]
         yield from response.follow_all(all_items_links, callback=self.parse_item)

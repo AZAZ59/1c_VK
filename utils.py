@@ -5,9 +5,12 @@ import pandas as pd
 import requests
 import vk
 from tqdm import tqdm
+import arrow
+from pathlib import Path
 
-date_XX_XX_XXXX = '16_08_2020 '
-album_comment   = 'Добавлено 16 Августа'
+date_XX_XX_XXXX = arrow.now().format("DD_MM_YYYY") 
+album_comment   = arrow.now().format('Добавлено DD MMMM',locale='ru')
+Path(f"./File/{date_XX_XX_XXXX}").mkdir(parents=True, exist_ok=True)
 
 def retry(retries=3):
     def decorator(f):
@@ -99,10 +102,10 @@ def merge_excel(save_dir):
     import glob
     big_df = pd.DataFrame()
     for file in tqdm(glob.glob(f'./res/_processed_*')):
-        if date_XX_XX_XXXX + '_VK_1C.xlsx' not in file:
-            df = pd.read_excel(file, index_col=0)
+        if date_XX_XX_XXXX + '/_VK_1C.xlsx' not in file:
+            df     = pd.read_excel(file, index_col=0)
             big_df = big_df.append(df, ignore_index=True)
-    big_df.to_excel(f'./File/' + date_XX_XX_XXXX + '_VK_1C.xlsx', index=False)
+    big_df.to_excel(f'./File/' + date_XX_XX_XXXX + '/_VK_1C.xlsx', index=False)
     return './_processed_FULL.xlsx'
 
 
@@ -135,7 +138,3 @@ def extract_size(x):
         return x[x.index(' р ') + 3:]
     except Exception as e:
         return ""
-
-
-if __name__ == '__main__':
-    merge_excel()
