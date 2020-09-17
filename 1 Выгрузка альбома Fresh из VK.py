@@ -6,8 +6,8 @@ import vk
 import vk.api
 from tqdm import tqdm
 
-# session Ксении
-session = vk.Session('c297dec325e43588e5472b7331c343760072c052abe7a0c90725f86e7bce440a9a2175629003e34c83916')
+# session 
+session = vk.Session('aef44be9f894721156bd392b40d79cd7c51fa6542d63980c04ee9a62a26c16b728819626b3d03c5f41cf4')
 
 from utils import VK_Item, merge_excel, art_split_markers, split_marker
 
@@ -181,7 +181,7 @@ def download_vk_album(group_id, album_id, save_dir):
 
 if __name__ == '__main__':
 
-    group_id = -182912257
+    group_id = -198234557
     album_id = ''
     save_dir = './res'
 

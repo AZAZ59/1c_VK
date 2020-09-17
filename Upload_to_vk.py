@@ -9,8 +9,6 @@ from tqdm import tqdm
 from config import *
 from utils  import CannotUploadPhotoException, download_photo, date_XX_XX_XXXX, album_comment
 
-# logging.basicConfig(level=logging.DEBUG)
-
 pd.set_option('display.max_rows',     1000)
 pd.set_option('display.max_columns',  1000)
 pd.set_option('display.max_colwidth', 1000)
@@ -30,9 +28,11 @@ def main():
 # privacy_view настройки приватности просмотра альбома 
 # privacy_commentнастройки приватности комментирования альбома в
 # upload_by_admins_only - 1 только
+# СДЕЛАТЬ - альбом создаем пользователем 
 
         album    = api.photos.createAlbum(title=group_name, group_id=group_id, description=album_comment, privacy_view=all, privacy_comment=all, upload_by_admins_only=1, comments_disabled=1 )
         album_id = album.id
+# СДЕЛАТЬ - фото грузим правами группы 
 
         download_all_photo(df)
 
@@ -44,7 +44,7 @@ def main():
             description = row['Описание']
             size        = row['Размер']
             cost        = row['Цена']  
-            description = description + '\nРазмер: ' + size + '\nЦена: '   + str(float(cost))
+            description = description + '\nРазмер: ' + str(size)+ f'\nЦена: {float(cost):.2f} руб.'
             filename    = ''.join([q if str.isalnum(q) else ' ' for q in row['Наименование']])
             filename    = f'./dir_to_send/{filename}.jpg'
 
