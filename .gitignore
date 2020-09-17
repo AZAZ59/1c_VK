@@ -7,4 +7,5 @@
 /**/*.xlsx
 *.jpg
 config.py
-
+/.idea
+/venv/
