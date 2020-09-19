@@ -1,3 +1,4 @@
+import pickle
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 from typing import List
@@ -6,7 +7,8 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 from utils import date_XX_XX_XXXX, album_comment
-
+from tqdm import tqdm
+from pprint import pprint
 
 def tryParse(value):
     try:
@@ -24,6 +26,7 @@ class Item_row:
     sizes: List[str] = field(default_factory=list)
     availabels: List[List[bool]] = field(default_factory=list)
     imgs: List[str] = field(default_factory=list)
+    row_num:int = 0
 
 
 @dataclass
@@ -47,7 +50,7 @@ def parse_file(filename) -> List[Item_row]:
     item_list = []
     cur_item = None
     cur_state = State.Init
-    for ind, row in enumerate(soup.select('tr')):
+    for ind, row in tqdm(enumerate(soup.select('tr'))):
         if 'Описание' in row.select('td')[0].text:
             cur_state = State.Description
 
@@ -60,8 +63,10 @@ def parse_file(filename) -> List[Item_row]:
                 cost = float(cost)
                 cur_item = Item_row()
 
+                cur_item.row_num=ind
                 cur_item.name = name
                 cur_item.cost = cost
+
                 for td in row.select('td')[4:14]:
                     cur_item.sizes.append(td.text)
                 cur_state = State.Available_Sizes
@@ -77,6 +82,14 @@ def parse_file(filename) -> List[Item_row]:
             cur_item.description = row.select('td')[0].text
             imgs = row.select('a')
             cur_item.imgs = [img.attrs['href'] for img in imgs]
+            if len(cur_item.availabels)==0:
+                print(row)
+                print(cur_item)
+                exit(0)
+            else:
+                while cur_item.availabels[-1]==[]:
+                    cur_item.color=cur_item.color[:-1]
+                    cur_item.availabels=cur_item.availabels[:-1]
 
             item_list.append(cur_item)
             cur_state = State.Init
@@ -85,46 +98,48 @@ def parse_file(filename) -> List[Item_row]:
 
 def main():
     filename = './PriceFresh/1.files/sheet001.htm'
+    parse= True
+#   parse=False
 
-    item_list = parse_file(filename)
+    if parse:
+        item_list = parse_file(filename)
+        pickle.dump(item_list,open('./item_list.pkl','wb'))
+    else:
+        item_list =pickle.load(open('./item_list.pkl','rb'))
 
     items = []
     for item in item_list:
+        try:
+            for ind, color in enumerate(item.color):
+                if color.strip()=='':
+                    print(f'error in item {item.name} -- color is empty')
+                    continue
+                if len(item.color) == len(item.imgs):
+                    color = item.imgs[ind]
+                elif len(item.imgs) == 0:
+                    color = "__НЕТ_КАРТИНКИ__"
+                    print(f'error in item {item.name} -- color is empty')
+                    pprint(item)
+                else:
+                    color = item.imgs[0]
 
-        if len(item.color) == len(item.imgs):
-            for ind, color in enumerate(item.color):
                 new_item = Item(
-                        name=item.name  # Наименование
-                             + " " + item.color[ind],
+                        name=item.name.replace('CLE ','') + " " + item.color[ind],
                         cost=item.cost,  # Цена
-                        description=item.name
-                                    + '\n' + item.description
-                                    + '\n' + item.color[ind],
-#                                    + '\nРазмер: ' + ', '.join(
-#                                [size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                        color=item.color[ind],  # Состав
-                        availabel_sizes=', '.join(
-                                [size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                        imgs_str=item.imgs[ind]
-                )
-                items.append(new_item)
-        else:
-            for ind, color in enumerate(item.color):
-                new_item = Item(
-                        name=item.name  # Наименование
-                             + " " + item.color[ind],
-                        cost=item.cost,  # Цена
-                        description=item.name
-                                    + '\n' + item.description
+                        description=item.name.replace('CLE ','')
+                                    + '\n' + item.description.replace('\n','').replace('Описание:','Описание:\n').replace('Состав:','\nСостав:')
                                     + '\n' + item.color[ind],
                         color=item.color[ind],
                         availabel_sizes=', '.join(
-                                [size for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                        imgs_str=item.imgs[0]
+                                [str(size).replace('р','').replace('p','') for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
+                        imgs_str=color
                 )
                 items.append(new_item)
-
+        except Exception as e:
+            pprint(f'error in item {item}',width=200)
+            raise e
     df = pd.DataFrame([asdict(x) for x in items])
+
 
     print(df.columns)
 
@@ -146,7 +161,7 @@ def main():
             'Цена',
             'Фото',
             'Группа'
-             ]]
+    ]]
 
     writer = pd.ExcelWriter("./File/" + date_XX_XX_XXXX + "/Альбомы для ВК.xlsx", engine='xlsxwriter')
     df.to_excel(writer, index=False)

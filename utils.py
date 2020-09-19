@@ -1,3 +1,4 @@
+import json
 import time
 from dataclasses import dataclass
 
@@ -7,6 +8,8 @@ import vk
 from tqdm import tqdm
 import arrow
 from pathlib import Path
+
+from config import remixsid
 
 date_XX_XX_XXXX = arrow.now().format("DD_MM_YYYY") 
 album_comment   = arrow.now().format('Добавлено DD MMMM',locale='ru')
@@ -138,3 +141,28 @@ def extract_size(x):
         return x[x.index(' р ') + 3:]
     except Exception as e:
         return ""
+
+def get_id(resp_json):
+    try:
+        return resp_json['payload'][1][0]['data'][0]
+    except:
+        print(resp_json)
+
+def get_request(action, hash="dc5f24945c0b68ff2b", group_id=192858688):
+    req = requests.post(
+        url='https://vk.com/al_market_manage_items.php',
+        data={
+            "act"     : "call_action",
+            "actions" : action,
+            "al"      : 1,
+            "group_id": group_id,
+            "hash"    : hash,
+            "lock_ver": 7600
+        },
+        cookies={
+            "remixsid": remixsid
+        }
+    )
+    time.sleep(0.3)
+    resp_json = json.loads(req.text[4:])
+    return resp_json
