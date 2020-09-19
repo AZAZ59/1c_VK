@@ -9,11 +9,10 @@ from utils import date_XX_XX_XXXX, extract_correnct_art_and_name
 logging.basicConfig(level=logging.DEBUG)
 import pandas as pd
 
-pd.options.display.max_colwidth = 40
-pd.options.display.max_columns = 400
-pd.options.display.max_rows = 1000
-pd.options.display.width = 222
-
+pd.options.display.max_colwidth =  40
+pd.options.display.max_columns  =  400
+pd.options.display.max_rows     = 1000
+pd.options.display.width        =  222
 
 def tryParse(value):
     try:
@@ -21,10 +20,8 @@ def tryParse(value):
     except ValueError:
         return False
 
-
-data_file = './data/Клевер НАЛИЧИЕ 09_09.zip'
-zip_ref = zipfile.ZipFile(data_file, 'r')
-
+data_file = './PriceFresh/' + 'Клевер НАЛИЧИЕ 09_09.zip'
+zip_ref   = zipfile.ZipFile(data_file, 'r')
 
 class State(Enum):
     Init = 0
@@ -158,11 +155,10 @@ def rename_collumns(df):
     return df
 
 def write_to_excel(df, filename):
-    filename=filename.replace('/','_')
-    writer = pd.ExcelWriter("./File/" + date_XX_XX_XXXX +'/' + filename
-                            , engine='xlsxwriter')
+    filename  = filename.replace('/','_')
+    writer    = pd.ExcelWriter('./PriceFresh/' + filename, engine='xlsxwriter')
     df.to_excel(writer, index=False)
-    workbook = writer.book
+    workbook  = writer.book
     worksheet = writer.sheets['Sheet1']
     worksheet.set_column('A:A', 55)
     worksheet.set_column('B:B', 8)
@@ -174,21 +170,19 @@ def write_to_excel(df, filename):
     writer.save()
     writer.close()
 
-
 def main():
     dataframe_list=[]
     for file in zip_ref.filelist:
         file: zipfile.ZipInfo
+        file.filename = file.filename.encode('cp437').decode('cp866')
         if file.filename.endswith('.xlsx'):
             logging.info(f"process file: {file.filename}")
             df = pd.read_excel(zip_ref.open(file))
-
             df = preprocess_data(df)
 
             item_list = parse_data(df)
 
             df_out = format_data(file.filename, item_list)
-
             df_out = rename_collumns(df_out)
 
             dataframe_list.append(df_out)
@@ -197,7 +191,7 @@ def main():
 
             logging.info('processed items count: %i', len(item_list))
             logging.info("")
-            break
+            
     df_full=pd.concat(dataframe_list)
     write_to_excel(df_full, 'CLEVER_FULL.xlsx')
     return df_full
@@ -220,28 +214,21 @@ def extract_index(row):
     ind=ind.strip().lower().replace(' ','')
     return ind
 
-
 if __name__ == '__main__':
-    # df=main()
-    df=pd.read_excel('./File/16_09_2020/CLEVER_FULL.xlsx')
+    df = main()
 
     df['ind']=df['Наименование'].apply(process_art)
     df = df.drop_duplicates('ind')
-    df=df.set_index('ind')
+    df = df.set_index('ind')
 
-
-
-    image_df = pd.read_excel('./data/_VK_1C.xlsx')
-    image_df=image_df.dropna(subset=['Картинка'])
+    image_df = pd.read_excel('./File/' + date_XX_XX_XXXX +'/_VK_1C.xlsx')
+    image_df = image_df.dropna(subset=['Картинка'])
     image_df['ind']=image_df[['Наименование полное','Состав']].apply(extract_index,axis=1)
 
     image_df = image_df.drop_duplicates('ind')
-    image_df=image_df.set_index('ind')
+    image_df = image_df.set_index('ind')
 
     merged=df.join(image_df,rsuffix='___',how='inner')
-
-
-
 
     print(df.head())
     print(image_df.head())
