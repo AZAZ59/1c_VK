@@ -15,6 +15,9 @@ from tqdm import tqdm
 
 from config import *
 
+group_id = 192858688
+owner_id = -group_id
+
 from utils import CannotUploadPhotoException, download_photo, date_XX_XX_XXXX, album_comment, get_id, get_request
 
 pd.set_option('display.max_rows', 1000)
@@ -24,15 +27,14 @@ pd.set_option('display.max_colwidth', 1000)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 api = vk.API(session, v='5.120')
-group_id = 192858688
-owner_id = -group_id
 
 req = requests.get(
         url='https://vk.com/public192858688?act=market_group_items',
         cookies={
                 "remixsid": remixsid
         }
-)
+                 )
+
 for line in req.text.splitlines():
     if line.startswith('window.initReactApplication'):
         json_line = line[line.index('{'):line.rindex('}') + 1]
@@ -72,6 +74,8 @@ def remove_all_albums(owner_id):
 def main( group_name7 ):
 
     df2 = pd.read_excel('./File/' + date_XX_XX_XXXX + '/Альбомы для ВК.xlsx')
+     
+#    sel=df2[df2['Группа']== group_name7]
 
     for group_name, df in df2.groupby('Группа'):
         if group_name != group_name7 :
@@ -228,31 +232,35 @@ def download_all_photo(df):
 
 
 if __name__ == '__main__':
+#
 #   remove_all_items(owner_id)
 #   remove_all_albums(owner_id)
+#
 
-#    main('CUBBY пижамы/халаты/белье')
-#    main('CUBBY - трикотаж')
-#    main('БЕЛЬЕ')
-#    main('РЮКЗАКИ')
-#    main('ЗИМА (верхняя одежда)')
-#    main('ОСЕНЬ/ВЕСНА (верхняя одежда)')
-
-# main('ВЯЗКА') -- много размеров
-
-#  main('Тrikozza и Very Neat (для взрослых)')
-#  main('ПИЖАМЫ - ХАЛАТЫ')
-#  main('ШКОЛА-сад')
- 
 # main('МАЛЫШИ')  -- ошибка  247 строка 
+# main('ДЕВОЧКИ') -- ошибка
 
-#  main('ДЕВОЧКИ') -- ошибка
-   main('МАЛЬЧИКИ')
-   main('КЕПКИ + шапки хб')
-   main('КОЛГОТКИ - НОСКИ')
+#   main('Тrikozza и Very Neat (для взрослых)')
+#   main('НОВЫЕ_ТОВАРЫ') -- много размеров
+#   main('ЗИМА (верхняя одежда)') -- много размеров
+#   main('РЮКЗАКИ')
+#   main('БЕЛЬЕ') -- ошибка 176 строка
 
-# main('КР')
-# main('КУПАЛЬНИКИ')
-# main('ДЖИНСА')
-# main('ФЛИС')
-                 
+    main('ОСЕНЬ/ВЕСНА (верхняя одежда)')
+
+#   main('ВЯЗКА')
+#main('ПИЖАМЫ - ХАЛАТЫ')
+#main('НОВИНКИ crockid')
+#main('ШКОЛА-сад')
+#main('МАЛЫШИ')
+#main('ДЕВОЧКИ')
+#main('МАЛЬЧИКИ')
+#main('CUBBY - трикотаж')
+#main('КЕПКИ + шапки хб')
+#main('КОЛГОТКИ - НОСКИ')
+#main('CUBBY пижамы/халаты/белье')
+#main('КР')
+#main('КУПАЛЬНИКИ')
+#main('ДЖИНСА')
+#main('ФЛИС')
+

@@ -1,0 +1,13 @@
+{}
+2020-09-19 19:04:27,680 vk    mixins:129 INFO: Getting permissions
+c6e9b662c9965822fec6df9768e7cc5f37d70e12417337433b96b81e4d19ef4fd7b0b0cb41ebcef874f23
+error in item CLE жилет мал.791590вэ школа -- color is empty
+Item_row(name='CLE жилет мал.791590вэ школа', cost=473.0, description='Описание:\n  \n    Комфортный жилет из джерси. По низу манжет. V-образная горловина с\n  обтачкой. \n    Состав: \n    70%Вис,22%ПЭ, 8%Эластан', color=['Цвет: меланж т.серый'], sizes=['key', 'р32', 'р34', 'р36', 'р38', 'р40', 'р42', 'UA', 'р28', 'р30'], availabels=[[False, False, False, False, False, False, True, True, False, False]], imgs=[], row_num=938)
+error in item CLE платье дев.794157н школа -- color is empty
+Item_row(name='CLE платье дев.794157н школа', cost=1133.0, description='Описание:\n  \n    Повседневное практичное платье из капитония со сьемным воротником,\n  полуприлегающего силуэта. Впереди карманы. Украшена модель брошкой на\n  воротнике. \n    Состав: \n    100%ПЭ', color=['Цвет: чёрный', '\xa0', '*', '', ''], sizes=['key', 'р32', 'р34', 'р36', 'р38', 'р40', 'р42', 'UA', 'р28', 'р30'], availabels=[[False, False, False, True, True, True, False, False, True, True], [], [], [False, False], [False, False]], imgs=[], row_num=1043)
+error in item CLE платье дев.794157н школа -- color is empty
+error in item CLE платье дев.794157н школа -- color is empty
+Item_row(name='CLE платье дев.794157н школа', cost=1133.0, description='Описание:\n  \n    Повседневное практичное платье из капитония со сьемным воротником,\n  полуприлегающего силуэта. Впереди карманы. Украшена модель брошкой на\n  воротнике. \n    Состав: \n    100%ПЭ', color=['Цвет: чёрный', '\xa0', '*', '', ''], sizes=['key', 'р32', 'р34', 'р36', 'р38', 'р40', 'р42', 'UA', 'р28', 'р30'], availabels=[[False, False, False, True, True, True, False, False, True, True], [], [], [False, False], [False, False]], imgs=[], row_num=1043)
+("error in item Item_row(name='CLE платье дев.794157н школа', cost=1133.0, description='Описание:\\n  \\n    Повседневное практичное платье из капитония со сьемным воротником,\\n  полуприлегающего "
+ "силуэта. Впереди карманы. Украшена модель брошкой на\\n  воротнике. \\n    Состав: \\n    100%ПЭ', color=['Цвет: чёрный', '\\xa0', '*', '', ''], sizes=['key', 'р32', 'р34', 'р36', 'р38', 'р40', "
+ "'р42', 'UA', 'р28', 'р30'], availabels=[[False, False, False, True, True, True, False, False, True, True], [], [], [False, False], [False, False]], imgs=[], row_num=1043)")

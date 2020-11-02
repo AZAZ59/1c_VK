@@ -9,7 +9,7 @@ from tqdm import tqdm
 import arrow
 from pathlib import Path
 
-from config import remixsid
+from config import *
 
 date_XX_XX_XXXX = arrow.now().format("DD_MM_YYYY") 
 album_comment   = arrow.now().format('Добавлено DD MMMM',locale='ru')
@@ -163,6 +163,7 @@ def get_request(action, hash="dc5f24945c0b68ff2b", group_id=192858688):
             "remixsid": remixsid
         }
     )
+
     time.sleep(0.3)
     resp_json = json.loads(req.text[4:])
     return resp_json

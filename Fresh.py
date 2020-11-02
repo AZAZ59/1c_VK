@@ -6,8 +6,8 @@ from typing import List
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from utils import date_XX_XX_XXXX, album_comment
-from tqdm import tqdm
+from utils  import date_XX_XX_XXXX, album_comment
+from tqdm   import tqdm
 from pprint import pprint
 
 def tryParse(value):
@@ -15,6 +15,7 @@ def tryParse(value):
         return float(value) > 0
     except ValueError:
         return False
+
 
 
 @dataclass
@@ -51,6 +52,7 @@ def parse_file(filename) -> List[Item_row]:
     cur_item = None
     cur_state = State.Init
     for ind, row in tqdm(enumerate(soup.select('tr'))):
+
         if 'Описание' in row.select('td')[0].text:
             cur_state = State.Description
 
@@ -97,42 +99,52 @@ def parse_file(filename) -> List[Item_row]:
 
 
 def main():
-    filename = './PriceFresh/1.files/sheet001.htm'
-    parse= True
-#   parse=False
+    filename = './PriceFresh/19_09_2020/1.files/sheet001.htm'
+#   parse = True
+    parse = False
 
     if parse:
         item_list = parse_file(filename)
         pickle.dump(item_list,open('./item_list.pkl','wb'))
     else:
         item_list =pickle.load(open('./item_list.pkl','rb'))
+    uniq_ind=0
 
     items = []
     for item in item_list:
         try:
-            for ind, color in enumerate(item.color):
-                if color.strip()=='':
+            #for ind, color in enumerate(item.color):
+            for ind, img_str in enumerate(item.imgs):
+                color=item.color[0]
+
+                if len(item.sizes) != len(item.availabels[0]):
+                    print(f'error in item {item.name} -- len(item.sizes) != len(item.availabels)')
+                    continue
+                elif color.strip()=='':
                     print(f'error in item {item.name} -- color is empty')
                     continue
-                if len(item.color) == len(item.imgs):
-                    color = item.imgs[ind]
+
+                # if len(item.color) == len(item.imgs):
+                #     img_str = item.imgs[ind]
+
                 elif len(item.imgs) == 0:
-                    color = "__НЕТ_КАРТИНКИ__"
+#                   img_str = "__НЕТ_КАРТИНКИ__"
+                    img_str = "https://sun9-37.userapi.com/9fP50zEQ17inz2__jggY2RMeG2cQ-DlxPdoQow/yiJ8CJthhDI.jpg"
                     print(f'error in item {item.name} -- color is empty')
                     pprint(item)
-                else:
-                    color = item.imgs[0]
-
+                # else:
+                #     img_str = item.imgs[0]
+                uniq_ind+=1
                 new_item = Item(
-                        name=item.name.replace('CLE ','') + " " + item.color[ind],
+                        name=item.name.replace('CLE ','') + " " + item.color[0] + " N " + f"{uniq_ind}",
                         cost=item.cost,  # Цена
                         description=item.name.replace('CLE ','')
                                     + '\n' + item.description.replace('\n','').replace('Описание:','Описание:\n').replace('Состав:','\nСостав:')
-                                    + '\n' + item.color[ind],
-                        color=item.color[ind],
+                                    + '\n' + item.color[0],
+                        color= "", # item.color[ind],
                         availabel_sizes=', '.join(
-                                [str(size).replace('р','').replace('p','') for ind1, size in enumerate(item.sizes) if item.availabels[ind][ind1]]),
-                        imgs_str=color
+                                [str(size).replace('р','').replace('p','') for ind1, size in enumerate(item.sizes) if item.availabels[0][ind1]]),
+                        imgs_str=img_str
                 )
                 items.append(new_item)
         except Exception as e:
@@ -156,7 +168,7 @@ def main():
     df = df[[
             'Наименование',
             'Описание',
-            #                 'Состав',
+            'Состав',
             'Размер',
             'Цена',
             'Фото',
