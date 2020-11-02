@@ -103,7 +103,7 @@ def parse_data(df):
             sizes_availables = []
             for n in range(1, 11):
                 size = row[f'sz{n}']
-                sizes_availables.append(size is not None)
+                sizes_availables.append(not pd.isna(size))
             cur_item.availabels.append(sizes_availables)
 
         elif cur_state == State.Description:
@@ -191,7 +191,6 @@ def main():
 
             logging.info('processed items count: %i', len(item_list))
             logging.info("")
-            
     df_full=pd.concat(dataframe_list)
     write_to_excel(df_full, 'CLEVER_FULL.xlsx')
     return df_full
@@ -215,7 +214,8 @@ def extract_index(row):
     return ind
 
 if __name__ == '__main__':
-    df = main()
+    # df=main()
+    df=pd.read_excel('./File/17_09_2020/CLEVER_FULL.xlsx')
 
     df['ind']=df['Наименование'].apply(process_art)
     df = df.drop_duplicates('ind')
@@ -229,6 +229,8 @@ if __name__ == '__main__':
     image_df = image_df.set_index('ind')
 
     merged=df.join(image_df,rsuffix='___',how='inner')
+write_to_excel(merged,'full_with_images.xlsx')
+
 
     print(df.head())
     print(image_df.head())
