@@ -9,11 +9,8 @@ from tqdm import tqdm
 # session Ксении
 session = vk.Session('c297dec325e43588e5472b7331c343760072c052abe7a0c90725f86e7bce440a9a2175629003e34c83916')
 
-#        stambul     - 'aef44be9f894721156bd392b40d79cd7c51fa6542d63980c04ee9a62a26c16b728819626b3d03c5f41cf4'
-session = vk.Session('aef44be9f894721156bd392b40d79cd7c51fa6542d63980c04ee9a62a26c16b728819626b3d03c5f41cf4')
+from utils import VK_Item, merge_excel, art_split_markers, split_marker
 
-
-from utils import VK_Item, merge_excel, art_split_markers, split_marker, date_XX_XX_XXXX
 
 def process_photo_batch(photos):
     batch_items = []
@@ -22,6 +19,27 @@ def process_photo_batch(photos):
 
         batch_items.append(VK_Item(urls[0]['url'], photo['text'], f'https://vk.com/photo{photo.owner_id}_{photo.id}'))
     return batch_items
+
+
+error_out = None
+art_out   = None
+
+def get_sizes(art, rows):
+    if ' р ' not in art:
+        size = ''
+        all_sizes = ''
+    else:
+        art, size = str(art).split(' р ')
+        size = size.replace(' ', '')
+        try:
+            all_sizes = ', '.join([str(x).split(' р ')[1].replace(' ', '') for x in rows if x != ''])
+        except Exception as e:
+            error_out.write(str(rows[-4:]) + '\n')
+            error_out.flush()
+            all_sizes = "________ОШИБКА________"
+
+    return all_sizes, art, size
+
 
 def extract_art_and_data(raw_data):
     rows = []
@@ -54,6 +72,7 @@ def extract_art_and_data(raw_data):
                 data_cols.append(val)
     return data_cols, rows
 
+
 def extract_correnct_art_and_name(art: str):
     for word in art_split_markers:
         if word in art.lower():
@@ -62,9 +81,8 @@ def extract_correnct_art_and_name(art: str):
             ret_name  = art[split_ind:]
             return ret_art, ret_name
     ### Если не нашли ни одного слова
-
-    error_out.write(' Не найден тип товара - ' + art + '\n')
-#   art_out.flush()
+    art_out.write(art + '\n')
+    art_out.flush()
     return art, '________NOT_FOUND__________'
 
 
@@ -74,75 +92,57 @@ def process_to_1c(df, save_dir, name, name_album):
             "Ссылка на товар",
             "Номенклатура",
             "Наименование полное",
+            "Размер",
             'Состав',
-            "Вид номенклатуры",
-            'Группа',
-            'Наименование',
-            'Описание',
-            'Размер',
-            'Фото',
-            'Цена'
+            'Розничная',
+            "Вид номенклатуры"
     ])
+    global error_out, art_out
+    error_out = open(f'./errors/{name}.txt', 'w', encoding='utf-8')
+    art_out   = open(f'./art/{name}.txt',    'w', encoding='utf-8')
 
-    global error_out
-    error_out = open(f'./File/' + date_XX_XX_XXXX + '/errors/' + name + '.txt', 'w', encoding='utf-8')
-  
     for ind, row in tqdm(df.iterrows(), total=len(df),desc=f'___{name_album}___'):
 
         raw_data = str(row['description']).split('\n')
         data_cols, rows = extract_art_and_data(raw_data)
 
-        # из первой строки Описания формиуем Наименование полное - текст до "размера" 
-        if len(rows)==0:
-            continue
-        art = rows[0]
+        for ind1, art in enumerate(rows):
+            all_sizes, art, size = get_sizes(art, rows)
+            art_new, name_new = extract_correnct_art_and_name(art)
 
-        if ' р ' in art:
-            art, size = str(art).split(' р ')
-        art = art.replace('?', '').strip()
+            if len(data_cols) == 0:
+                continue
+            try:
+                data_cols[-1] = int(
+                        str(data_cols[-1]).lower().replace('руб.', '').replace('руб', '').replace('цена:', '')
+                            .replace(':', '').strip())
+            except:
+                data_cols[-1] = "_______НЕТ_ЦЕНЫ________"
 
-        # Артикул - это текст Наименование полное до "джемпер"
-        art_new, name_new = extract_correnct_art_and_name(art)
+            art = art.replace('?', '').strip()
 
-        # может вынести формирование состава 
+            df2 = df2.append({
+                    "Картинка"           : row['photo_url'] if ind1 == 0 else '',
+                    "Ссылка на товар"    : row['link']      if ind1 == 0 else '',
+                    "Номенклатура"       : art_new,
+                    "Наименование полное": art,
+                    # "Размер"             : size,
+                    'Состав'             : ((data_cols[-3] + " ") if len(data_cols) >= 3 else "") + (
+                            data_cols[-2] if len(data_cols) >= 2 else ""),
+                    'Розничная'          : data_cols[-1] if len(data_cols) >= 1 else "_______НЕТ_ЦЕНЫ???",
+                    "Вид номенклатуры"   : name_album
+            }, ignore_index=True)
 
-        df2 = df2.append({
-            "Картинка"           : row['photo_url'],
-            "Ссылка на товар"    : row['link'],
-            "Номенклатура"       : art_new,
-            "Наименование полное": art,
-            'Состав'             : ((data_cols[-3] + " ") if len(data_cols) >= 3 else "") + (
-                    data_cols[-2] if len(data_cols) >= 2 else ""),
-            "Вид номенклатуры"   : name_album,
-            'Группа'             : name_album,
-            'Наименование'       : art,
-            'Описание'           : ( 'Артикул: '  + art         + '\n' 
-                                   + 'Описание: ' + raw_data[2] + '\n' 
-                                   + raw_data[3]                + '\n' 
-				   + raw_data[4]
-                                   ),
-            'Размер'             : raw_data[5],
-            'Фото'               : row['photo_url'],
-            'Цена'               : raw_data[6]
-        }, ignore_index=True)
-
-    # вывести дубли 
-    duplicated=df2[df2.duplicated(subset='Номенклатура')]
-    dupli_out.write(duplicated.to_csv(None,sep=';'))
- 
-    # убрать дубли по art_new  -- аритикул --
-    df2 = df2.drop_duplicates(subset='Номенклатура')
-    
     print('\n'*1)
 
     error_out.close()
-#   art_out.close()
+    art_out.close()
 
     if len(df2) == 0:
         return
     else:
         df2.to_excel(f'{save_dir}/_processed_{name}.xlsx')
-    return           f'{save_dir}/_processed_{name}.xlsx'
+    return f'{save_dir}/_processed_{name}.xlsx'
 
 
 def download_vk_album(group_id, album_id, save_dir):
@@ -185,16 +185,8 @@ def download_vk_album(group_id, album_id, save_dir):
 if __name__ == '__main__':
 
     group_id = -182912257
-
-#               198234557 ФРЕШ (фото клевер)
-    group_id = -198234557
-
     album_id = ''
-
-    save_dir = './File/' + date_XX_XX_XXXX + '/res'
-
-    error_out = None
-    dupli_out = open(f'./File/' + date_XX_XX_XXXX + '/errors/Дубли_в_Альбомах.txt', 'w', encoding='utf-8')
+    save_dir = './res'
 
     download_vk_album(group_id, album_id, save_dir)
     merge_excel(save_dir)

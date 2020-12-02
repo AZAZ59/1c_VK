@@ -1,3 +1,6 @@
+#   Удалить скрытые колонки
+#   Сохранить в формате html
+
 import pickle
 from dataclasses import dataclass, field, asdict
 from enum import Enum
@@ -15,8 +18,6 @@ def tryParse(value):
         return float(value) > 0
     except ValueError:
         return False
-
-
 
 @dataclass
 class Item_row:
@@ -99,15 +100,18 @@ def parse_file(filename) -> List[Item_row]:
 
 
 def main():
-    filename = './PriceFresh/19_09_2020/1.files/sheet001.htm'
-#   parse = True
-    parse = False
+    
+    filename = './PriceFresh/11_2020/1.htm'
+    filename = './PriceFresh/11_2020/1.files/sheet001.htm'
+
+    parse = True
+    # parse = False
 
     if parse:
         item_list = parse_file(filename)
-        pickle.dump(item_list,open('./item_list.pkl','wb'))
+        pickle.dump(item_list, open('./File/' + date_XX_XX_XXXX + '/item_list.pkl','wb'))
     else:
-        item_list =pickle.load(open('./item_list.pkl','rb'))
+        item_list =pickle.load(open('./File/' + date_XX_XX_XXXX + '/item_list.pkl','rb'))
     uniq_ind=0
 
     items = []
@@ -150,8 +154,8 @@ def main():
         except Exception as e:
             pprint(f'error in item {item}',width=200)
             raise e
+#   print(items[:5])
     df = pd.DataFrame([asdict(x) for x in items])
-
 
     print(df.columns)
 

@@ -13,7 +13,9 @@ from config import *
 
 date_XX_XX_XXXX = arrow.now().format("DD_MM_YYYY") 
 album_comment   = arrow.now().format('Добавлено DD MMMM',locale='ru')
-Path(f"./File/{date_XX_XX_XXXX}").mkdir(parents=True, exist_ok=True)
+Path(f"./File/{date_XX_XX_XXXX}")       .mkdir(parents=True, exist_ok=True)
+Path(f"./File/{date_XX_XX_XXXX}/res")   .mkdir(parents=True, exist_ok=True)
+Path(f"./File/{date_XX_XX_XXXX}/errors").mkdir(parents=True, exist_ok=True)
 
 def retry(retries=3):
     def decorator(f):
@@ -72,12 +74,11 @@ import os.path
 
 def download_photo(url, name):
     path = f'./dir_to_send/{name}.jpg'
-    if not os.path.isfile(path):
+    if True or not os.path.isfile(path):
         content = requests.get(url, verify=False).content
 
         with open(path, "wb") as file:
             file.write(content)
-
 
 class CannotUploadPhotoException(Exception):
     pass
@@ -104,16 +105,16 @@ def clear_file(file):
 def merge_excel(save_dir):
     import glob
     big_df = pd.DataFrame()
-    for file in tqdm(glob.glob(f'./res/_processed_*')):
-        if date_XX_XX_XXXX + '/_VK_1C.xlsx' not in file:
+    for file in tqdm(glob.glob(f'./File/' + date_XX_XX_XXXX + '/res/_processed_*')):
+        if                      './File/' + date_XX_XX_XXXX + '/_VK_1C.xlsx' not in file:
             df     = pd.read_excel(file, index_col=0)
             big_df = big_df.append(df, ignore_index=True)
     big_df.to_excel(f'./File/' + date_XX_XX_XXXX + '/_VK_1C.xlsx', index=False)
-    return './_processed_FULL.xlsx'
+    return           './File/' + date_XX_XX_XXXX + '/res/_processed_FULL.xlsx'
 
 
-art_split_markers = set(" " + (x.lower().strip()) for x in open('./art_markers.txt', encoding='utf-8').readlines())
-split_marker = set(x.lower().strip() for x in open('./split_markers.txt', encoding='utf-8').readlines())
+art_split_markers = set(" " + (x.lower().strip()) for x in open('./art_markers.txt',   encoding='utf-8').readlines())
+split_marker      = set(       x.lower().strip()  for x in open('./split_markers.txt', encoding='utf-8').readlines())
 
 
 def extract_correnct_art_and_name(art: str):
