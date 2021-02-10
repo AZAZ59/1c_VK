@@ -168,3 +168,10 @@ def get_request(action, hash="dc5f24945c0b68ff2b", group_id=192858688):
     time.sleep(0.3)
     resp_json = json.loads(req.text[4:])
     return resp_json
+
+class safelist(list):
+    def get(self, index, default=None):
+        try:
+            return self.__getitem__(index)
+        except IndexError:
+            return default

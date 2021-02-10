@@ -13,7 +13,7 @@ session = vk.Session('c297dec325e43588e5472b7331c343760072c052abe7a0c90725f86e7b
 session = vk.Session('aef44be9f894721156bd392b40d79cd7c51fa6542d63980c04ee9a62a26c16b728819626b3d03c5f41cf4')
 
 
-from utils import VK_Item, merge_excel, art_split_markers, split_marker, date_XX_XX_XXXX
+from utils import VK_Item, merge_excel, art_split_markers, split_marker, date_XX_XX_XXXX,safelist
 
 def process_photo_batch(photos):
     batch_items = []
@@ -90,6 +90,7 @@ def process_to_1c(df, save_dir, name, name_album):
     for ind, row in tqdm(df.iterrows(), total=len(df),desc=f'___{name_album}___'):
 
         raw_data = str(row['description']).split('\n')
+        raw_data=safelist(raw_data)
         data_cols, rows = extract_art_and_data(raw_data)
 
         # из первой строки Описания формиуем Наименование полное - текст до "размера" 
@@ -105,7 +106,7 @@ def process_to_1c(df, save_dir, name, name_album):
         art_new, name_new = extract_correnct_art_and_name(art)
 
         # может вынести формирование состава 
-
+#        print(len(raw_data))
         df2 = df2.append({
             "Картинка"           : row['photo_url'],
             "Ссылка на товар"    : row['link'],
@@ -114,16 +115,16 @@ def process_to_1c(df, save_dir, name, name_album):
             'Состав'             : ((data_cols[-3] + " ") if len(data_cols) >= 3 else "") + (
                     data_cols[-2] if len(data_cols) >= 2 else ""),
             "Вид номенклатуры"   : name_album,
-            'Группа'             : name_album,
+            'Группа'             : '02_дек ' + name_album,
             'Наименование'       : art,
             'Описание'           : ( 'Артикул: '  + art         + '\n' 
                                    + 'Описание: ' + raw_data[2] + '\n' 
-                                   + raw_data[3]                + '\n' 
-				   + raw_data[4]
+                                   + raw_data.get(3,"")                + '\n' 
+				   + raw_data.get(4,"")
                                    ),
-            'Размер'             : raw_data[5],
+            'Размер'             : raw_data.get(5,"Нет размера"),
             'Фото'               : row['photo_url'],
-            'Цена'               : raw_data[6]
+            'Цена'               : raw_data.get(6,0)
         }, ignore_index=True)
 
     # вывести дубли 
@@ -185,9 +186,9 @@ def download_vk_album(group_id, album_id, save_dir):
 if __name__ == '__main__':
 
     group_id = -182912257
-
 #               198234557 ФРЕШ (фото клевер)
-    group_id = -198234557
+#               202009856 1С клевер
+    group_id = -202009856
 
     album_id = ''
 
