@@ -156,7 +156,8 @@ def extract_property_old(art, data_cols, name_album, raw_data, row):
 
 def extract_property_new(name_album, raw_data, row):
     art = raw_data[0]
-    return {
+    try:
+        res= {
         "Картинка": row['photo_url'],
         "Ссылка на товар": row['link'],
         'Группа': '02_дек ' + name_album,
@@ -169,12 +170,17 @@ def extract_property_new(name_album, raw_data, row):
 
         'Состав': raw_data[2],
         'Описание': ('Артикул: ' + art + '\n'
-                     + 'Описание: ' + raw_data[3] + '\n'
-                     + 'Цвет:' + raw_data[1]
+                     + 'Описание: ' + raw_data[3] if len(raw_data) ==6 else "____ НЕТ ОПИСАНИЯ ____"
+                     + '\nЦвет:' + raw_data[1]
                      ),
-        'Размер': raw_data[4],
-        'Цена': raw_data[5]
+        'Размер': raw_data[-2],
+        'Цена': raw_data[-1]
     }
+    except Exception as e:
+        print(raw_data)
+        print(row['link']),
+        raise e
+    return res
 
 
 def download_vk_album(group_id, album_id, save_dir):
@@ -219,8 +225,8 @@ if __name__ == '__main__':
     #               198234557 ФРЕШ (фото клевер)
     #               202009856 1С клевер
     group_id = -202009856
-
     album_id = ''
+    album_id = '457239292'
 
     save_dir = './File/' + date_XX_XX_XXXX + '/res'
 
