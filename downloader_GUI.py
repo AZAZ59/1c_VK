@@ -226,7 +226,6 @@ if __name__ == '__main__':
     #               202009856 1С клевер
     group_id = -202009856
     album_id = ''
-    album_id = '457239292'
 
     save_dir = './File/' + date_XX_XX_XXXX + '/res'
 
