@@ -157,25 +157,26 @@ def extract_property_old(art, data_cols, name_album, raw_data, row):
 def extract_property_new(name_album, raw_data, row):
     art = raw_data[0]
     try:
-        res= {
-        "Картинка": row['photo_url'],
-        "Ссылка на товар": row['link'],
-        'Группа': '02_дек ' + name_album,
-        "Вид номенклатуры": name_album,
-        'Фото': row['photo_url'],
+        res = {
+            "Картинка": row['photo_url'],
+            "Ссылка на товар": row['link'],
+            'Группа': '02_дек ' + name_album,
+            "Вид номенклатуры": name_album,
+            'Фото': row['photo_url'],
 
-        'Наименование': art,
-        "Номенклатура": art,
-        "Наименование полное": art,
+            'Наименование': art,
+            "Номенклатура": art,
+            "Наименование полное": art,
 
-        'Состав': raw_data[2],
-        'Описание': ('Артикул: ' + art + '\n'
-                     + 'Описание: ' + raw_data[3] if len(raw_data) ==6 else "____ НЕТ ОПИСАНИЯ ____"
-                     + '\nЦвет:' + raw_data[1]
-                     ),
-        'Размер': raw_data[-2],
-        'Цена': raw_data[-1]
-    }
+            'Состав': raw_data[2],
+            'Описание': ('Артикул: ' + art + '\n'
+                         + 'Описание: ' + raw_data[3] if len(raw_data) == 6 else "____ НЕТ ОПИСАНИЯ ____"
+                                                                                 + '\nЦвет:' + raw_data[1]
+                         ),
+            'Цвет':  raw_data[1],
+            'Размер': raw_data[-2] if len(raw_data) >3 else "____ НЕТ РАЗМЕРА ____",
+            'Цена': raw_data[-1]  if len(raw_data) >3 else "____ НЕТ ЦЕНЫ ____",
+        }
     except Exception as e:
         print(raw_data)
         print(row['link']),
@@ -200,7 +201,7 @@ def download_vk_album(group_id, album_id, save_dir):
         offset = 0
         count = 1000
         photos = api.photos.get(owner_id=group_id, album_id=album['id'], count=1000, photo_sizes=1, offset=offset)
-        while (offset + count <= photos['count']):
+        while offset + count <= photos['count']:
             album_items.extend(process_photo_batch(photos))
             offset += count
             photos = api.photos.get(owner_id=group_id, album_id=album['id'], count=1000, photo_sizes=1,
@@ -226,6 +227,7 @@ if __name__ == '__main__':
     #               202009856 1С клевер
     group_id = -202009856
     album_id = ''
+    album_id = 278630205
 
     save_dir = './File/' + date_XX_XX_XXXX + '/res'
 
