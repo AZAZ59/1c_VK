@@ -36,7 +36,7 @@ def main():
         album_id = album.id
 # СДЕЛАТЬ - фото грузим правами группы 
 
-#       download_all_photo(df)
+        download_all_photo(df)
 
         upload_url = api.photos.getUploadServer(album_id=album_id, group_id=group_id)['upload_url']
 

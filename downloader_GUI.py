@@ -78,7 +78,6 @@ def process_to_1c(df, save_dir, name, name_album):
         "Наименование полное",
         'Состав',
         "Вид номенклатуры",
-        'Группа',
         'Наименование',
         'Описание',
         'Размер',
@@ -141,7 +140,6 @@ def extract_property_old(art, data_cols, name_album, raw_data, row):
         'Состав': ((data_cols[-3] + " ") if len(data_cols) >= 3 else "") + (
             data_cols[-2] if len(data_cols) >= 2 else ""),
         "Вид номенклатуры": name_album,
-        'Группа': '02_дек ' + name_album,
         'Наименование': art,
         'Описание': ('Артикул: ' + art + '\n'
                      + 'Описание: ' + raw_data[2] + '\n'
@@ -158,24 +156,12 @@ def extract_property_new(name_album, raw_data, row):
     art = raw_data[0]
     try:
         res = {
-            "Картинка": row['photo_url'],
-            "Ссылка на товар": row['link'],
-            'Группа': '02_дек ' + name_album,
-            "Вид номенклатуры": name_album,
-            'Фото': row['photo_url'],
-
-            'Наименование': art,
-            "Номенклатура": art,
-            "Наименование полное": art,
-
-            'Состав': raw_data[2],
-            'Описание': ('Артикул: ' + art + '\n'
-                         + 'Описание: ' + raw_data[3] if len(raw_data) == 6 else "____ НЕТ ОПИСАНИЯ ____"
-                                                                                 + '\nЦвет:' + raw_data[1]
-                         ),
-            'Цвет':  raw_data[1],
-            'Размер': raw_data[-2] if len(raw_data) >3 else "____ НЕТ РАЗМЕРА ____",
-            'Цена': raw_data[-1]  if len(raw_data) >3 else "____ НЕТ ЦЕНЫ ____",
+            "Картинка"           : row['photo_url'],
+#           "Ссылка на товар"    : row['link'],
+            "Вид номенклатуры"   : name_album,
+#           'Наименование'       : art,
+            "Номенклатура"       : art,
+            'Состав'             :  raw_data[1],
         }
     except Exception as e:
         print(raw_data)
@@ -227,7 +213,6 @@ if __name__ == '__main__':
     #               202009856 1С клевер
     group_id = -202009856
     album_id = ''
-    album_id = 278630205
 
     save_dir = './File/' + date_XX_XX_XXXX + '/res'
 
