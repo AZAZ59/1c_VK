@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<yml_catalog date="2021-04-01 12:20">
+  <shop>
+    <name>vk.com</name>
+    <company>vk.com</company>
+    <url>https://vk.com/</url>
+    <currencies>
+      <currency id="RUB" rate="1"/>
+    </currencies>
+    <categories>
+      <category id="1">КИДС - clever</category>
+    </categories>
+    <offers>
+      <offer id="GV5470 Майка дев. белый 128-64 1" available="true" group_id="GV5470 Майка дев. белый">
+        <price>128</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>1</categoryId>
+        <name>GV5470 Майка дев. белый 128-64</name>
+        <description>92% хлопок, 8% эластан</description>
+        <param name="Цвет">белый</param>
+        <param name="Размер">128-64</param>
+        <picture>https://sun9-69.userapi.com/impg/dMJsBg4knnyGQYhpUtE1Efq21wDv41tmfmFhNw/1G6qQR00njc.jpg?size=1000x1400&quality=95&sign=190e6f7bbed0f0611deadb30fd17c7a4&c_uniq_tag=</picture>
+      </offer>
+      <offer id="GV5470 Майка дев. белый 104-56 2" group_id="GV5470 Майка дев. белый">
+        <price>104</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>1</categoryId>
+        <name>GV5470 Майка дев. белый 104-56</name>
+        <description>92% хлопок, 8% эластан</description>
+        <param name="Цвет">белый</param>
+        <param name="Размер">104-56</param>
+        <picture>https://sun9-69.userapi.com/impg/dMJsBg4knnyGQYhpUtE1Efq21wDv41tmfmFhNw/1G6qQR00njc.jpg?size=1000x1400&quality=95&sign=190e6f7bbed0f0611deadb30fd17c7a4&c_uniq_tag</picture>
+      </offer>
+      <offer id="GV5470 Майка дев. белый 116-60 3" group_id="GV5470 Майка дев. белый">
+        <price>116</price>
+        <currencyId>RUB</currencyId>
+        <categoryId>1</categoryId>
+        <name>GV5470 Майка дев. белый 116-60</name>
+        <description>92% хлопок, 8% эластан</description>
+        <param name="Цвет">белый</param>
+        <param name="Размер">116-60</param>
+        <picture>https://sun9-69.userapi.com/impg/dMJsBg4knnyGQYhpUtE1Efq21wDv41tmfmFhNw/1G6qQR00njc.jpg?size=1000x1400&quality=95&sign=190e6f7bbed0f0611deadb30fd17c7a4&c_uniq_tag</picture>
+      </offer>
+    </offers>
+  </shop>
+</yml_catalog>

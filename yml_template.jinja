@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<yml_catalog date="{{ date }}">
+  <shop>
+    <name>{{ shop_name }}</name>
+    <company>{{ company_name }}</company>
+    <url>{{ shop_url}}</url>
+    <currencies>
+      <currency id="RUB" rate="1"/>
+    </currencies>
+    <categories>
+        {% for category in category_list -%}
+            <category id="{{ category.id }}">{{category.name}}</category>
+        {% endfor %}
+    </categories>
+    <offers>
+        {% for offer in offer_list -%}
+            <offer id="{{ offer.id }}" available="true" group_id="{{ offer.art|replace('"','') }}">
+                <price>{{ offer.price }}</price>
+                <currencyId>RUB</currencyId>
+                <categoryId>{{ offer.category_id }}</categoryId>
+                <name>{{ offer.art }}</name>
+                <description>{{ offer.description }}</description>
+                <param name="Размер2">{{offer.size}}</param>
+                <picture>{{ offer.photo_url }}</picture>
+        </offer>
+        {% endfor %}
+    </offers>
+  </shop>
+</yml_catalog>
